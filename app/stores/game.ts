@@ -18,6 +18,20 @@ export const useGameStore = defineStore("game", {
   }),
 
   getters: {
+    playerTotal: (state) => {
+      return (playerId: string) =>
+        state.scores
+          .filter((s) => s.playerId === playerId)
+          .reduce((sum, s) => sum + (s.value ?? 0), 0);
+    },
+
+    roundTotal: (state) => {
+      return (roundId: string) =>
+        state.scores
+          .filter((s) => s.roundId === roundId)
+          .reduce((sum, s) => sum + (s.value ?? 0), 0);
+    },
+
     totalByPlayer: (state) => {
       return state.players.map((p) => ({
         playerId: p.id,
@@ -38,6 +52,13 @@ export const useGameStore = defineStore("game", {
         id: nanoid(),
         index: this.rounds.length + 1,
       });
+    },
+
+    initRounds() {
+      this.rounds = Array.from({ length: 9 }, (_, i) => ({
+        id: nanoid(),
+        index: i + 1,
+      }));
     },
 
     setCount(n: number) {
