@@ -1,0 +1,33 @@
+{
+  "name": "game-score",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.3.3",
+    "@capacitor/cli": "8.3.3",
+    "@capacitor/core": "8.3.3",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/preferences": "8.0.1",
+    "@ionic/vue": "8.8.6",
+    "@ionic/vue-router": "8.8.6",
+    "@pinia/nuxt": "0.11.3",
+    "nanoid": "5.1.11",
+    "nuxt": "4.4.5",
+    "pinia": "3.0.4",
+    "vue": "3.5.33",
+    "vue-router": "5.0.6"
+  },
+  "devDependencies": {
+    "eslint": "10.3.0",
+    "prettier": "3.8.3",
+    "typescript": "6.0.3",
+    "vue-tsc": "3.2.8"
+  }
+}

@@ -1,0 +1,1 @@
+<template>New Game</template>
