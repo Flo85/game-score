@@ -4,9 +4,16 @@ import type { Player, Round, Score } from "~/types/game.type";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
+    count: 2,
     id: nanoid(),
-    players: [] as Array<Player>,
-    rounds: [] as Array<Round>,
+    players: [
+      { id: nanoid(), name: "Joueur 1" },
+      { id: nanoid(), name: "Joueur 2" },
+    ] as Array<Player>,
+    rounds: [
+      { id: nanoid(), index: 1 },
+      { id: nanoid(), index: 2 },
+    ] as Array<Round>,
     scores: [] as Array<Score>,
   }),
 
@@ -31,6 +38,10 @@ export const useGameStore = defineStore("game", {
         id: nanoid(),
         index: this.rounds.length + 1,
       });
+    },
+
+    setCount(n: number) {
+      this.count = n;
     },
 
     setScore(playerId: string, roundId: string, value: number) {
