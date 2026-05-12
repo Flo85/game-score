@@ -42,7 +42,9 @@
                 (el) =>
                   registerInput(
                     `${player.id}-${round.id}`,
-                    el?.$el?.querySelector('input') ?? null,
+                    (el as ComponentPublicInstance | null)?.$el?.querySelector(
+                      'input',
+                    ) ?? null,
                   )
               "
               inputmode="numeric"
@@ -76,7 +78,6 @@ import {
   IonInput,
 } from "@ionic/vue";
 
-import { useGameStore } from "~/stores/game";
 const game = useGameStore();
 
 const inputs = ref<Record<string, HTMLInputElement | null>>({});
@@ -98,7 +99,11 @@ function getPlayerTotal(playerId: string) {
     .reduce((sum, s) => sum + (s.value ?? 0), 0);
 }
 
-function onScoreInput(playerId: string, roundId: string, value: any) {
+function onScoreInput(
+  playerId: string,
+  roundId: string,
+  value: string | number | null | undefined,
+) {
   const num = Number(value);
   if (!isNaN(num)) {
     game.setScore(playerId, roundId, num);
