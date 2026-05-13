@@ -1,8 +1,10 @@
 <template>
+  <IonImg :src="LogoUrl"></IonImg>
+
   <IonItem>
     <IonLabel>
       <h1 class="title">Nouvelle partie</h1>
-      <p>Maximum de 6 joueurs</p>
+      <p>Maximum de 7 joueurs</p>
     </IonLabel>
   </IonItem>
 
@@ -43,6 +45,10 @@
     Commencer la partie
   </IonButton>
 
+  <IonButton color="secondary" expand="block" @click="showHistory">
+    Historique
+  </IonButton>
+
   <IonFab horizontal="end" slot="fixed" vertical="bottom">
     <IonFabButton
       :disabled="farawayGameStore.maxPlayersReached"
@@ -59,6 +65,7 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
+  IonImg,
   IonInput,
   IonItem,
   IonLabel,
@@ -69,6 +76,8 @@ import {
 
 import { add, trash } from "ionicons/icons";
 import { ImpactStyle } from "@capacitor/haptics";
+
+import LogoUrl from "~/assets/images/logo-faraway.png";
 
 const farawayGameStore = useFarawayGameStore();
 const router = useRouter();
@@ -92,15 +101,22 @@ const reorderPlayers = (event: any) => {
 };
 
 const startGame = () => {
-  farawayGameStore.initGame();
+  farawayGameStore.newGame();
   router.push("/faraway/game");
+};
+
+const showHistory = () => {
+  router.push("/faraway/history");
 };
 </script>
 
 <style scoped>
 .title {
+  color: #3a2f1b;
   font-size: 26px;
   font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .fade-slide-enter-active,

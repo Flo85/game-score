@@ -8,4 +8,10 @@
 
 <script setup>
 import { IonApp } from "@ionic/vue";
+
+const farawayGameStore = useFarawayGameStore();
+
+onMounted(() => {
+  farawayGameStore.init();
+});
 </script>

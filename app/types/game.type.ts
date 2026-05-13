@@ -5,10 +5,16 @@ export type PlayerType = {
 
 export type ScoresType = { [playerId: string]: Array<number | null> };
 
-export type GameStoreType = {
+export type GameListItemType = {
   createdAt: string;
-  id: string;
+  id: string | null;
   numberOfRows: number;
   players: Array<PlayerType>;
   scores: ScoresType;
+  writable: boolean;
+};
+
+export type GameStoreType = GameListItemType & {
+  _autoSaveInitialized?: boolean;
+  history: Array<GameListItemType>;
 };

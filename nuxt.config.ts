@@ -19,6 +19,7 @@ export default defineNuxtConfig({
       include: [
         "@capacitor/core",
         "@capacitor/haptics",
+        "@capacitor/preferences",
         "@ionic/vue",
         "ionicons/icons",
         "nanoid",

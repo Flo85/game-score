@@ -1,5 +1,9 @@
 <template>
-  <h1 class="title">Feuille de score</h1>
+  <IonItem>
+    <IonLabel>
+      <h1 class="title">Feuille de score</h1>
+    </IonLabel>
+  </IonItem>
 
   <IonGrid class="score-grid">
     <IonRow class="header-row">
@@ -12,7 +16,10 @@
         :key="player.id"
         class="player-header"
       >
-        <IonInput v-model="player.name" />
+        <IonInput
+          v-model="player.name"
+          :disabled="!farawayGameStore.writable"
+        />
       </IonCol>
     </IonRow>
 
@@ -44,6 +51,7 @@
           @keyup.enter="focusNext(`${player.id}-${row}`)"
           :ref="(el) => registerInput(`${player.id}-${row}`, el)"
           inputmode="numeric"
+          :disabled="!farawayGameStore.writable"
           class="score-input"
         />
       </IonCol>
@@ -60,11 +68,27 @@
       </IonCol>
     </IonRow>
   </IonGrid>
+
+  <IonButton
+    color="primary"
+    :disabled="!farawayGameStore.writable"
+    expand="block"
+    @click="endGame"
+  >
+    Partie terminée
+  </IonButton>
 </template>
 
 <script setup lang="ts">
 import { ImpactStyle } from "@capacitor/haptics";
-import { IonGrid, IonRow, IonCol, IonInput, IonImg } from "@ionic/vue";
+import {
+  IonButton,
+  IonCol,
+  IonGrid,
+  IonImg,
+  IonInput,
+  IonRow,
+} from "@ionic/vue";
 import IconeJeuUrl from "~/assets/images/icone-jeu.png";
 import IconeSantcuaireUrl from "~/assets/images/icone-sanctuaire.png";
 
@@ -111,6 +135,10 @@ function focusNext(currentKey: string) {
   if (nextKey) {
     nextTick(() => inputs.value[nextKey]?.focus());
   }
+}
+
+function endGame() {
+  farawayGameStore.endGame();
 }
 </script>
 
