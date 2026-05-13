@@ -1,23 +1,14 @@
-export type Player = {
+export type PlayerType = {
   id: string;
   name: string;
 };
 
-export type Round = {
-  id: string;
-  index: number;
-};
+export type ScoresType = { [playerId: string]: Array<number | null> };
 
-export type Score = {
-  playerId: string;
-  roundId: string;
-  value: number;
-};
-
-export type Game = {
+export type GameStoreType = {
   createdAt: string;
   id: string;
-  players: Array<Player>;
-  rounds: Array<Round>;
-  scores: Array<Score>;
+  numberOfRows: number;
+  players: Array<PlayerType>;
+  scores: ScoresType;
 };

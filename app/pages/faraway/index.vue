@@ -1,9 +1,17 @@
 <template>
-  <h1 class="title">Nouvelle partie</h1>
+  <IonItem>
+    <IonLabel>
+      <h1 class="title">Nouvelle partie</h1>
+      <p>Maximum de 6 joueurs</p>
+    </IonLabel>
+  </IonItem>
 
   <IonList>
     <IonReorderGroup :disabled="false" @ionItemReorder="reorderPlayers">
-      <template v-for="(player, i) in gameStore.players" :key="player.id">
+      <template
+        v-for="(player, i) in farawayGameStore.players"
+        :key="player.id"
+      >
         <IonItem>
           <IonInput
             :label="`Joueur ${i + 1}`"
@@ -15,7 +23,7 @@
           <IonButton
             fill="clear"
             color="danger"
-            @click="removePlayer(player.id)"
+            @click="farawayGameStore.removePlayer(player.id)"
           >
             <IonIcon :icon="trash" />
           </IonButton>
@@ -26,12 +34,20 @@
     </IonReorderGroup>
   </IonList>
 
-  <IonButton expand="block" color="primary" @click="startGame">
+  <IonButton
+    color="primary"
+    :disabled="farawayGameStore.noPlayer"
+    expand="block"
+    @click="startGame"
+  >
     Commencer la partie
   </IonButton>
 
-  <IonFab vertical="bottom" horizontal="end" slot="fixed">
-    <IonFabButton @click="addPlayer">
+  <IonFab horizontal="end" slot="fixed" vertical="bottom">
+    <IonFabButton
+      :disabled="farawayGameStore.maxPlayersReached"
+      @click="addPlayer"
+    >
       <IonIcon :icon="add" />
     </IonFabButton>
   </IonFab>
@@ -39,47 +55,44 @@
 
 <script setup lang="ts">
 import {
-  IonList,
-  IonItem,
-  IonInput,
   IonButton,
   IonFab,
   IonFabButton,
   IonIcon,
-  IonReorderGroup,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
   IonReorder,
+  IonReorderGroup,
 } from "@ionic/vue";
 
 import { add, trash } from "ionicons/icons";
 import { ImpactStyle } from "@capacitor/haptics";
 
-const gameStore = useGameStore();
+const farawayGameStore = useFarawayGameStore();
 const router = useRouter();
 
 const addPlayer = async () => {
   await vibrate(ImpactStyle.Light);
-  gameStore.addPlayer(`Joueur ${gameStore.players.length + 1}`);
-};
-
-const removePlayer = async (id: string) => {
-  await vibrate(ImpactStyle.Medium);
-  gameStore.players = gameStore.players.filter((p) => p.id !== id);
+  farawayGameStore.addPlayer(`Joueur ${farawayGameStore.players.length + 1}`);
 };
 
 const reorderPlayers = (event: any) => {
   const from = event.detail.from;
   const to = event.detail.to;
 
-  const moved = gameStore.players.splice(from, 1)[0];
+  const moved = farawayGameStore.players.splice(from, 1)[0];
 
   if (moved) {
-    gameStore.players.splice(to, 0, moved);
+    farawayGameStore.players.splice(to, 0, moved);
   }
 
   event.detail.complete();
 };
 
 const startGame = () => {
+  farawayGameStore.initGame();
   router.push("/faraway/game");
 };
 </script>
@@ -88,7 +101,6 @@ const startGame = () => {
 .title {
   font-size: 26px;
   font-weight: 700;
-  margin-bottom: 20px;
 }
 
 .fade-slide-enter-active,

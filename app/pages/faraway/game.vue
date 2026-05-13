@@ -1,44 +1,48 @@
 <template>
   <h1 class="title">Feuille de score</h1>
 
-  <!-- Grille principale -->
   <IonGrid class="score-grid">
-    <!-- Ligne d'en-tête : noms des joueurs -->
     <IonRow class="header-row">
-      <IonCol size="1"></IonCol>
-      <!-- case vide -->
+      <IonCol size="1" class="icon">
+        <IonImg :src="IconeJeuUrl"></IonImg>
+      </IonCol>
+
       <IonCol
-        v-for="player in game.players"
+        v-for="player in farawayGameStore.players"
         :key="player.id"
         class="player-header"
       >
-        <div class="player-name">{{ player.name }}</div>
+        <IonInput v-model="player.name" />
       </IonCol>
     </IonRow>
 
-    <!-- Lignes des manches -->
-    <IonRow v-for="round in game.rounds" :key="round.id" class="score-row">
-      <!-- Numéro de manche -->
-      <IonCol size="1" class="line-number">
-        {{ round.index }}
+    <IonRow
+      v-for="row in farawayGameStore.numberOfRows"
+      :key="row"
+      class="score-row"
+    >
+      <IonCol
+        v-if="row !== farawayGameStore.numberOfRows"
+        size="1"
+        class="line-number"
+      >
+        {{ row }}
+      </IonCol>
+      <IonCol v-else size="1" class="line-number icon">
+        <IonImg :src="IconeSantcuaireUrl"></IonImg>
       </IonCol>
 
-      <!-- Score pour chaque joueur -->
-      <IonCol v-for="player in game.players" :key="player.id" class="score-col">
+      <IonCol
+        v-for="player in farawayGameStore.players"
+        :key="player.id"
+        class="score-col"
+      >
         <IonInput
           type="number"
-          :value="getScore(player.id, round.id)"
-          @ionInput="onScoreInput(player.id, round.id, $event.target?.value)"
-          @keyup.enter="focusNext(`${player.id}-${round.id}`)"
-          :ref="
-            (el) =>
-              registerInput(
-                `${player.id}-${round.id}`,
-                (el as ComponentPublicInstance | null)?.$el?.querySelector(
-                  'input',
-                ) ?? null,
-              )
-          "
+          :value="getScore(player.id, row)"
+          @ionInput="onScoreInput(player.id, row, $event.target?.value)"
+          @keyup.enter="focusNext(`${player.id}-${row}`)"
+          :ref="(el) => registerInput(`${player.id}-${row}`, el)"
           inputmode="numeric"
           class="score-input"
         />
@@ -48,54 +52,54 @@
     <IonRow class="total-row">
       <IonCol size="1" class="total-label">T</IonCol>
       <IonCol
-        v-for="player in game.players"
+        v-for="player in farawayGameStore.players"
         :key="player.id"
         class="total-score"
       >
-        {{ getPlayerTotal(player.id) }}
+        {{ farawayGameStore.playerTotal(player.id) }}
       </IonCol>
     </IonRow>
   </IonGrid>
 </template>
 
 <script setup lang="ts">
-import { IonGrid, IonRow, IonCol, IonInput } from "@ionic/vue";
+import { ImpactStyle } from "@capacitor/haptics";
+import { IonGrid, IonRow, IonCol, IonInput, IonImg } from "@ionic/vue";
+import IconeJeuUrl from "~/assets/images/icone-jeu.png";
+import IconeSantcuaireUrl from "~/assets/images/icone-sanctuaire.png";
 
-const game = useGameStore();
+const farawayGameStore = useFarawayGameStore();
 
 const inputs = ref<Record<string, HTMLInputElement | null>>({});
 
-function registerInput(key: string, el: HTMLInputElement | null) {
-  inputs.value[key] = el;
+function registerInput(
+  key: string,
+  el: Element | ComponentPublicInstance | null,
+) {
+  if (!el || !("$el" in el)) {
+    inputs.value[key] = null;
+    return;
+  }
+
+  const element = el.$el?.querySelector("input") ?? null;
+  inputs.value[key] = element;
 }
 
-function getScore(playerId: string, roundId: string) {
-  return (
-    game.scores.find((s) => s.playerId === playerId && s.roundId === roundId)
-      ?.value ?? ""
-  );
+function getScore(playerId: string, row: number) {
+  return farawayGameStore.scores[playerId]?.[row] ?? "";
 }
 
-function getPlayerTotal(playerId: string) {
-  return game.scores
-    .filter((s) => s.playerId === playerId)
-    .reduce((sum, s) => sum + (s.value ?? 0), 0);
-}
-
-function onScoreInput(
+async function onScoreInput(
   playerId: string,
-  roundId: string,
+  row: number,
   value: string | number | null | undefined,
 ) {
   const num = Number(value);
   if (!isNaN(num)) {
-    game.setScore(playerId, roundId, num);
+    farawayGameStore.setScore(playerId, row, num);
 
-    // Haptics
     if (import.meta.client) {
-      import("@capacitor/haptics").then(({ Haptics, ImpactStyle }) => {
-        Haptics.impact({ style: ImpactStyle.Light });
-      });
+      await vibrate(ImpactStyle.Light);
     }
   }
 }
@@ -108,69 +112,63 @@ function focusNext(currentKey: string) {
     nextTick(() => inputs.value[nextKey]?.focus());
   }
 }
-
-onMounted(() => {
-  game.initRounds();
-});
 </script>
 
 <style scoped>
 .title {
+  color: #3a2f1b;
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 20px;
   text-align: center;
-  color: #3a2f1b;
 }
 
 .score-grid {
   background: #f7f3e9;
   border: 2px solid #b8a98f;
   border-radius: 6px;
-  overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .header-row {
+  align-items: center;
   background: #e9dfc9;
   border-bottom: 2px solid #b8a98f;
   text-align: center;
 }
 
 .player-header {
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding: 8px 0;
-}
-
-.player-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: #3a2f1b;
 }
 
 .score-row {
   align-items: center;
   border-bottom: 1px solid #d6c9b3;
-  height: 48px;
 }
 
 .line-number {
+  color: #3a2f1b;
   font-weight: 700;
   text-align: center;
-  color: #3a2f1b;
+}
+
+.icon {
+  --ion-grid-column-padding: 0;
 }
 
 .score-col {
-  display: flex;
   align-items: center;
+  display: flex;
   justify-content: center;
 }
 
 .score-input {
-  width: 100%;
   text-align: center;
+  width: 100%;
 }
 
 .score-input input {
@@ -185,21 +183,25 @@ onMounted(() => {
 }
 
 .total-label {
+  align-content: center;
   font-weight: 700;
+  height: 100%;
   text-align: center;
 }
 
 .total-row {
+  align-items: center;
   background: #b22222;
+  border-top: 2px solid #7a1616;
   color: white;
   height: 55px;
-  align-items: center;
-  border-top: 2px solid #7a1616;
 }
 
 .total-score {
-  font-weight: 700;
+  align-content: center;
   font-size: 18px;
+  font-weight: 700;
+  height: 100%;
   text-align: center;
 }
 
