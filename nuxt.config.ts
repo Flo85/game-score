@@ -2,27 +2,25 @@
 export default defineNuxtConfig({
   app: { baseURL: "/", buildAssetsDir: "assets" },
 
-  devtools: { enabled: process.env.NODE_ENV === "development" },
+  devtools: { enabled: false },
 
   modules: ["@pinia/nuxt"],
 
-  nitro:
-    process.env.NODE_ENV === "development"
-      ? {}
-      : {
-          preset: "static",
-          prerender: { routes: ["/"] },
-          output: { publicDir: "dist" },
-        },
+  nitro: {
+    preset: "static",
+    prerender: { routes: ["/"] },
+    output: { publicDir: "dist" },
+  },
 
-  ssr: process.env.NODE_ENV === "development" ? true : false,
+  ssr: false,
 
   vite: {
     optimizeDeps: {
       include: [
+        "@capacitor/core",
         "@capacitor/haptics",
-        "@vue/devtools-core",
-        "@vue/devtools-kit",
+        "@ionic/vue",
+        "ionicons/icons",
         "nanoid",
       ],
     },

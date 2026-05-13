@@ -1,82 +1,65 @@
 <template>
-  <IonPage>
-    <IonContent>
-      <h1 class="title">Feuille de score</h1>
+  <h1 class="title">Feuille de score</h1>
 
-      <!-- Grille principale -->
-      <IonGrid class="score-grid">
-        <!-- Ligne d'en-tête : noms des joueurs -->
-        <IonRow class="header-row">
-          <IonCol size="1"></IonCol>
-          <!-- case vide -->
-          <IonCol
-            v-for="player in game.players"
-            :key="player.id"
-            class="player-header"
-          >
-            <div class="player-name">{{ player.name }}</div>
-          </IonCol>
-        </IonRow>
+  <!-- Grille principale -->
+  <IonGrid class="score-grid">
+    <!-- Ligne d'en-tête : noms des joueurs -->
+    <IonRow class="header-row">
+      <IonCol size="1"></IonCol>
+      <!-- case vide -->
+      <IonCol
+        v-for="player in game.players"
+        :key="player.id"
+        class="player-header"
+      >
+        <div class="player-name">{{ player.name }}</div>
+      </IonCol>
+    </IonRow>
 
-        <!-- Lignes des manches -->
-        <IonRow v-for="round in game.rounds" :key="round.id" class="score-row">
-          <!-- Numéro de manche -->
-          <IonCol size="1" class="line-number">
-            {{ round.index }}
-          </IonCol>
+    <!-- Lignes des manches -->
+    <IonRow v-for="round in game.rounds" :key="round.id" class="score-row">
+      <!-- Numéro de manche -->
+      <IonCol size="1" class="line-number">
+        {{ round.index }}
+      </IonCol>
 
-          <!-- Score pour chaque joueur -->
-          <IonCol
-            v-for="player in game.players"
-            :key="player.id"
-            class="score-col"
-          >
-            <IonInput
-              type="number"
-              :value="getScore(player.id, round.id)"
-              @ionInput="
-                onScoreInput(player.id, round.id, $event.target?.value)
-              "
-              @keyup.enter="focusNext(`${player.id}-${round.id}`)"
-              :ref="
-                (el) =>
-                  registerInput(
-                    `${player.id}-${round.id}`,
-                    (el as ComponentPublicInstance | null)?.$el?.querySelector(
-                      'input',
-                    ) ?? null,
-                  )
-              "
-              inputmode="numeric"
-              class="score-input"
-            />
-          </IonCol>
-        </IonRow>
+      <!-- Score pour chaque joueur -->
+      <IonCol v-for="player in game.players" :key="player.id" class="score-col">
+        <IonInput
+          type="number"
+          :value="getScore(player.id, round.id)"
+          @ionInput="onScoreInput(player.id, round.id, $event.target?.value)"
+          @keyup.enter="focusNext(`${player.id}-${round.id}`)"
+          :ref="
+            (el) =>
+              registerInput(
+                `${player.id}-${round.id}`,
+                (el as ComponentPublicInstance | null)?.$el?.querySelector(
+                  'input',
+                ) ?? null,
+              )
+          "
+          inputmode="numeric"
+          class="score-input"
+        />
+      </IonCol>
+    </IonRow>
 
-        <IonRow class="total-row">
-          <IonCol size="1" class="total-label">T</IonCol>
-          <IonCol
-            v-for="player in game.players"
-            :key="player.id"
-            class="total-score"
-          >
-            {{ getPlayerTotal(player.id) }}
-          </IonCol>
-        </IonRow>
-      </IonGrid>
-    </IonContent>
-  </IonPage>
+    <IonRow class="total-row">
+      <IonCol size="1" class="total-label">T</IonCol>
+      <IonCol
+        v-for="player in game.players"
+        :key="player.id"
+        class="total-score"
+      >
+        {{ getPlayerTotal(player.id) }}
+      </IonCol>
+    </IonRow>
+  </IonGrid>
 </template>
 
 <script setup lang="ts">
-import {
-  IonPage,
-  IonContent,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonInput,
-} from "@ionic/vue";
+import { IonGrid, IonRow, IonCol, IonInput } from "@ionic/vue";
 
 const game = useGameStore();
 

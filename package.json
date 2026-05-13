@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:mobile": "concurrently \"npm run dev -- --host\" \"npx cap run android\"",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -19,12 +20,13 @@
     "@ionic/vue-router": "8.8.6",
     "@pinia/nuxt": "0.11.3",
     "nanoid": "5.1.11",
-    "nuxt": "4.4.5",
+    "nuxt": "4.4.2",
     "pinia": "3.0.4",
     "vue": "3.5.33",
     "vue-router": "5.0.6"
   },
   "devDependencies": {
+    "concurrently": "9.2.1",
     "eslint": "10.3.0",
     "prettier": "3.8.3",
     "typescript": "6.0.3",
