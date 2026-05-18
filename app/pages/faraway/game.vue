@@ -142,7 +142,7 @@ function endGame() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .title {
   color: #3a2f1b;
   font-size: 26px;
@@ -221,8 +221,8 @@ function endGame() {
 
 .total-row {
   align-items: center;
-  background: #b22222;
-  border-top: 2px solid #7a1616;
+  background: $faraway-color-background-2;
+  border-top: 2px solid $faraway-color-border-2;
   color: white;
   height: 55px;
 }

@@ -15,6 +15,11 @@ export default defineNuxtConfig({
   ssr: false,
 
   vite: {
+    css: {
+      preprocessorOptions: {
+        scss: { additionalData: '@use "@/assets/styles/main" as *;' },
+      },
+    },
     optimizeDeps: {
       include: [
         "@capacitor/core",

@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "cap:run:emulator": "set CAP_EMULATOR=true&& npx cap run android",
+    "cap:run:mobile": "npx cap run android",
     "dev": "nuxt dev",
-    "dev:mobile": "concurrently \"npm run dev -- --host\" \"npx cap run android\"",
+    "dev:emulator": "set CAP_EMULATOR=true&& npm run dev -- --host",
+    "dev:mobile": "npm run dev -- --host",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "preview": "nuxt preview"
   },
   "dependencies": {
     "@capacitor/android": "8.3.3",
@@ -26,9 +29,10 @@
     "vue-router": "5.0.6"
   },
   "devDependencies": {
-    "concurrently": "9.2.1",
+    "@types/node": "25.8.0",
     "eslint": "10.3.0",
     "prettier": "3.8.3",
+    "sass-embedded": "1.99.0",
     "typescript": "6.0.3",
     "vue-tsc": "3.2.8"
   }
