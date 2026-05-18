@@ -143,29 +143,24 @@ function endGame() {
 </script>
 
 <style scoped lang="scss">
-.title {
-  color: #3a2f1b;
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.score-grid {
-  background: #f7f3e9;
-  border: 2px solid #b8a98f;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
 .header-row {
   align-items: center;
-  background: #e9dfc9;
-  border-bottom: 2px solid #b8a98f;
+  background: $faraway-color-background-1;
+  border-bottom: 2px solid $faraway-color-border-1;
   position: sticky;
   text-align: center;
   top: 0;
   z-index: 10;
+}
+
+.icon {
+  --ion-grid-column-padding: 0;
+}
+
+.line-number {
+  color: $faraway-color-font-1;
+  font-weight: 700;
+  text-align: center;
 }
 
 .player-header {
@@ -175,25 +170,18 @@ function endGame() {
   padding: 8px 0;
 }
 
-.score-row {
-  align-items: center;
-  border-bottom: 1px solid #d6c9b3;
-}
-
-.line-number {
-  color: #3a2f1b;
-  font-weight: 700;
-  text-align: center;
-}
-
-.icon {
-  --ion-grid-column-padding: 0;
-}
-
 .score-col {
   align-items: center;
+  border-left: 1px dashed #b8a98f;
   display: flex;
   justify-content: center;
+}
+
+.score-grid {
+  background: #f7f3e9;
+  border: 2px solid $faraway-color-border-1;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .score-input {
@@ -202,49 +190,57 @@ function endGame() {
 }
 
 .score-input input {
-  background: #fffdf8;
-  border: 2px solid #b8a98f;
+  background: $faraway-color-background-2;
+  border: 2px solid $faraway-color-border-1;
   border-radius: 4px;
-  color: #3a2f1b;
+  color: $faraway-color-font-1;
   font-size: 18px;
   font-weight: 600;
   padding: 4px;
   text-align: center;
 }
 
+.score-row {
+  align-items: center;
+  border-bottom: 1px solid #d6c9b3;
+}
+
+.title {
+  color: $faraway-color-font-1;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
 .total-label {
-  align-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
   height: 100%;
-  text-align: center;
 }
 
 .total-row {
   align-items: center;
-  background: $faraway-color-background-2;
+  background: $faraway-color-background-3;
   border-top: 2px solid $faraway-color-border-2;
-  color: white;
+  color: $faraway-color-font-2;
   height: 55px;
 }
 
-.total-score {
-  align-content: center;
+.total-row .total-score {
+  align-items: center;
+  border-left: 1px dashed rgba(255, 255, 255, 0.6);
+  display: flex;
   font-size: 18px;
   font-weight: 700;
   height: 100%;
-  text-align: center;
-}
-
-.score-col {
-  border-left: 1px dashed #b8a98f;
+  justify-content: center;
 }
 
 .score-row .score-col:first-of-type {
   border-left: none;
-}
-
-.total-row .total-score {
-  border-left: 1px dashed rgba(255, 255, 255, 0.6);
 }
 
 .total-row .total-score:first-of-type {
