@@ -22,12 +22,12 @@ const goToFaraway = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .title {
   color: #3a2f1b;
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   text-align: center;
 }
 </style>

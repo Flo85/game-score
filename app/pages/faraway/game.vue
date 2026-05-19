@@ -10,7 +10,7 @@
       class="score-grid"
       ref="gridRef"
       :style="{
-        minWidth: `calc(48px + ${farawayGameStore.players.length} * 80px)`,
+        minWidth: `calc(3rem + ${farawayGameStore.players.length} * 5rem)`,
       }"
     >
       <IonRow class="header-row" ref="headerRowRef">
@@ -26,6 +26,7 @@
           <IonTextarea
             v-model="player.name"
             :auto-grow="true"
+            class="player-name"
             :disabled="!farawayGameStore.writable"
             :rows="1"
           />
@@ -36,6 +37,9 @@
         v-for="row in farawayGameStore.numberOfRows"
         :key="row"
         class="score-row"
+        :class="{
+          'score-row--last': row === farawayGameStore.numberOfRows,
+        }"
       >
         <IonCol
           v-if="row !== farawayGameStore.numberOfRows"
@@ -185,62 +189,81 @@ function endGame() {
 </script>
 
 <style scoped lang="scss">
+// ── Colonne fixe (sticky horizontal) ─────────────────────────────────────────
 .col-fixed {
-  align-items: center;
-  align-self: stretch;
-  display: flex;
-  justify-content: center;
+  @include flex-center;
+
+  background: inherit;
   left: 0;
-  max-width: 48px;
+  max-width: 3rem;
   position: sticky;
   z-index: 5;
 }
 
+// ── Header ────────────────────────────────────────────────────────────────────
 .header-row {
-  align-items: center;
-  background: $faraway-color-background-1;
-  border-bottom: 2px solid $faraway-color-border-1;
-  border-top: 2px solid $faraway-color-border-1;
-  position: sticky;
+  align-items: stretch;
+  background: $faraway-color-background-default;
+  min-height: 3.5rem;
+  position: relative;
   text-align: center;
-  top: 0;
   z-index: 10;
 }
 
 .game-icon {
-  background: $faraway-color-background-1;
-  border-right: 1px dashed $faraway-color-border-1;
-}
-
-.sanctuary-icon {
-  --ion-grid-column-padding: 0;
-}
-
-.line-number {
-  background: #f7f3e9;
-  border-right: 1px dashed $faraway-color-border-1;
-  color: $faraway-color-font-1;
-  font-weight: 700;
-  text-align: center;
+  background: $faraway-color-background-default;
+  border-right: 1px dashed $faraway-color-border-default;
 }
 
 .player-header {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  padding: 8px 0;
+  @include flex-center(column);
+
+  border-right: 1px dashed $faraway-color-border-default;
+
+  &:last-of-type {
+    border-right: none;
+  }
+}
+
+.player-name {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  min-height: unset;
+}
+
+// ── Lignes de score ───────────────────────────────────────────────────────────
+.score-row {
+  align-items: stretch;
+  background: $faraway-color-background-default;
+  border-top: 1px dashed $faraway-color-border-default;
+  min-height: 3.5rem;
+
+  &--last {
+    background: $faraway-color-background-sanctuary-score;
+    border-top: 1px solid $faraway-color-border-default;
+  }
+}
+
+.line-number {
+  background: $faraway-color-background-default;
+  border-right: 1px dashed $faraway-color-border-default;
+  font-size: 2rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.sanctuary-icon {
+  background: $faraway-color-background-sanctuary-score;
 }
 
 .score-col {
-  align-items: center;
-  border-right: 1px dashed $faraway-color-border-1;
-  display: flex;
-  justify-content: center;
-}
+  @include flex-center;
 
-.score-grid {
-  --ion-grid-padding: 0;
-  background: #f7f3e9;
+  border-right: 1px dashed $faraway-color-border-default;
+
+  &:last-of-type {
+    border-right: none;
+  }
 }
 
 .score-input {
@@ -248,20 +271,39 @@ function endGame() {
   width: 100%;
 }
 
-.score-input input {
-  background: $faraway-color-background-2;
-  border: 2px solid $faraway-color-border-1;
-  border-radius: 4px;
-  color: $faraway-color-font-1;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 4px;
-  text-align: center;
+// ── Ligne total ───────────────────────────────────────────────────────────────
+.total-row {
+  align-items: stretch;
+  color: $faraway-color-font-total-score;
+  min-height: 3.5rem;
 }
 
-.score-row {
-  align-items: center;
-  border-bottom: 1px solid $faraway-color-border-1;
+.total-label,
+.total-score {
+  @include flex-center;
+
+  background: $faraway-color-background-total-score;
+  border-right: 1px dashed white;
+
+  &:last-of-type {
+    border-right: none;
+  }
+}
+
+.total-label {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.total-score {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+// ── Grille ────────────────────────────────────────────────────────────────────
+.score-grid {
+  --ion-grid-padding: 0;
+  color: $faraway-color-font-default;
 }
 
 .score-scroll-wrapper {
@@ -270,47 +312,12 @@ function endGame() {
   width: 100%;
 }
 
+// ── Titre ─────────────────────────────────────────────────────────────────────
 .title {
-  color: $faraway-color-font-1;
-  font-size: 26px;
+  color: $faraway-color-font-default;
+  font-size: 1.625rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   text-align: center;
-}
-
-.total-label {
-  align-items: center;
-  background: $faraway-color-background-3;
-  border-right: 1px dashed white;
-  display: flex;
-  font-weight: 700;
-  height: 100%;
-  justify-content: center;
-}
-
-.total-row {
-  align-items: center;
-  background: $faraway-color-background-3;
-  border-top: 2px solid $faraway-color-border-2;
-  color: $faraway-color-font-2;
-  height: 55px;
-}
-
-.total-row .total-score {
-  align-items: center;
-  border-right: 1px dashed white;
-  display: flex;
-  font-size: 18px;
-  font-weight: 700;
-  height: 100%;
-  justify-content: center;
-}
-
-.score-row .score-col:last-of-type {
-  border-right: none;
-}
-
-.total-row .total-score:last-of-type {
-  border-right: none;
 }
 </style>
