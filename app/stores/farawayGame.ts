@@ -1,3 +1,6 @@
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import { defineStore } from "pinia";
 import { nanoid } from "nanoid";
 import type {
@@ -54,6 +57,53 @@ export const useFarawayGameStore = defineStore("game", {
 
     endGame(): void {
       this.writable = false;
+    },
+
+    async exportHistory(): Promise<void> {
+      const history = this.history;
+
+      if (!history.length) return;
+
+      const json = JSON.stringify(history, null, 2);
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/:/g, "-");
+      const fileName = `faraway-history-${timestamp}.json`;
+
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const result = await Filesystem.writeFile({
+            data: json,
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8,
+            path: fileName,
+          });
+
+          await Share.share({
+            dialogTitle: "Partager le JSON d'historique",
+            text: "Voici l'historique des parties au format JSON.",
+            title: "Exporter l'historique",
+            url: result.uri ?? undefined,
+          });
+
+          return;
+        } catch (error) {
+          console.error("Export natif échoué:", error);
+        }
+      }
+
+      if (typeof document !== "undefined") {
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
     },
 
     async init(): Promise<void> {

@@ -5,10 +5,18 @@
     </IonLabel>
   </IonItem>
 
+  <IonButton
+    color="primary"
+    expand="block"
+    @click="farawayGameStore.exportHistory"
+  >
+    Exporter l'historique en JSON
+  </IonButton>
+
   <IonList>
     <IonItem
       v-for="game in farawayGameStore.history"
-      :key="game.id"
+      :key="game.id || undefined"
       @click="open(game.id)"
     >
       <IonLabel>
@@ -23,7 +31,7 @@
   </IonList>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { IonButton, IonIcon, IonItem, IonLabel, IonList } from "@ionic/vue";
 
 import { trash } from "ionicons/icons";
@@ -31,14 +39,15 @@ import { trash } from "ionicons/icons";
 const farawayGameStore = useFarawayGameStore();
 const router = useRouter();
 
-const open = async (id) => {
+const open = async (id: string | null): Promise<void> => {
+  if (!id) return;
+
   await farawayGameStore.loadGame(id);
   router.push("/faraway/game");
 };
 
-const remove = async (id) => {
-  await farawayGameStore.deleteGame(id);
-};
+const remove = async (id: string | null): Promise<void> =>
+  id ? farawayGameStore.deleteGame(id) : undefined;
 </script>
 
 <style scoped lang="scss">
