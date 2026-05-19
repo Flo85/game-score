@@ -38,7 +38,7 @@ const router = useRouter();
 const go = (path) => router.push(path);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .tab-buttons {
   justify-content: space-around;
 }
