@@ -15,6 +15,7 @@ export type GameListItemType = {
 };
 
 export type GameStoreType = GameListItemType & {
-  _autoSaveInitialized?: boolean;
+  autoSaveInitialized: boolean;
   history: Array<GameListItemType>;
+  readyForAutoSave: boolean;
 };

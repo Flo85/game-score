@@ -139,6 +139,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  farawayGameStore.reset();
   scrollEl?.removeEventListener("scroll", onScroll);
 });
 

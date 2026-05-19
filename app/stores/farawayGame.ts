@@ -12,7 +12,7 @@ const NUMBER_OF_ROWS = 9;
 
 export const useFarawayGameStore = defineStore("game", {
   state: (): GameStoreType => ({
-    _autoSaveInitialized: false,
+    autoSaveInitialized: false,
     createdAt: new Date().toISOString(),
     history: [],
     id: null,
@@ -21,6 +21,7 @@ export const useFarawayGameStore = defineStore("game", {
       { id: nanoid(), name: "Joueur 1" },
       { id: nanoid(), name: "Joueur 2" },
     ],
+    readyForAutoSave: false,
     scores: {},
     writable: true,
   }),
@@ -56,22 +57,14 @@ export const useFarawayGameStore = defineStore("game", {
     },
 
     async init(): Promise<void> {
-      this.createdAt = new Date().toISOString();
-      this.id = nanoid();
-      this.scores = this.players.reduce<ScoresType>((acc, player) => {
-        acc[player.id] = Array(9).fill(null);
-        return acc;
-      }, {});
-
       this.updateHistory();
-
       this.initAutoSave();
     },
 
     initAutoSave(): void {
-      if (this._autoSaveInitialized) return;
+      if (this.autoSaveInitialized) return;
 
-      this._autoSaveInitialized = true;
+      this.autoSaveInitialized = true;
 
       const { saveItem } = useGameStorage(GAME_KEY);
 
@@ -82,7 +75,7 @@ export const useFarawayGameStore = defineStore("game", {
           writable: this.writable,
         }),
         async () => {
-          if (!this.id) return;
+          if (!this.id || !this.readyForAutoSave) return;
 
           await saveItem<GameListItemType>(
             {
@@ -114,21 +107,10 @@ export const useFarawayGameStore = defineStore("game", {
       this.writable = savedGame.writable;
     },
 
-    async listGames(): Promise<
-      Array<{ createdAt: string; id: string | null }>
-    > {
-      const { getList, loadItem } = useGameStorage(GAME_KEY);
-      const gameIds = await getList();
-      const games = await Promise.all(
-        gameIds.map((id) => loadItem<GameListItemType>(id)),
-      );
-      return games
-        .filter((game): game is GameListItemType => Boolean(game))
-        .map((game) => ({ id: game.id, createdAt: game.createdAt }));
-    },
-
     async newGame(): Promise<void> {
       const { saveItem } = useGameStorage("faraway-game");
+
+      this.readyForAutoSave = false;
 
       this.createdAt = new Date().toISOString();
       this.id = nanoid();
@@ -138,16 +120,21 @@ export const useFarawayGameStore = defineStore("game", {
       }, {});
       this.writable = true;
 
-      await saveItem<GameListItemType>({
-        createdAt: new Date().toISOString(),
-        id: this.id,
-        numberOfRows: this.numberOfRows,
-        players: this.players,
-        scores: this.scores,
-        writable: this.writable,
-      });
+      await saveItem<GameListItemType>(
+        {
+          createdAt: new Date().toISOString(),
+          id: this.id,
+          numberOfRows: this.numberOfRows,
+          players: this.players,
+          scores: this.scores,
+          writable: this.writable,
+        },
+        this.id,
+      );
 
       this.updateHistory();
+
+      this.readyForAutoSave = true;
     },
 
     removePlayer(playerId: string): void {
@@ -155,16 +142,14 @@ export const useFarawayGameStore = defineStore("game", {
       delete this.scores[playerId];
     },
 
-    async saveGame(): Promise<void> {
-      const { saveItem } = useGameStorage(GAME_KEY);
-      await saveItem<GameListItemType>({
-        createdAt: this.createdAt,
-        id: this.id,
-        numberOfRows: this.numberOfRows,
-        players: this.players,
-        scores: this.scores,
-        writable: this.writable,
-      });
+    reset(): void {
+      this.readyForAutoSave = false;
+      this.id = null;
+      this.players = [
+        { id: nanoid(), name: "Joueur 1" },
+        { id: nanoid(), name: "Joueur 2" },
+      ];
+      this.scores = {};
     },
 
     setScore(playerId: string, row: number, value: number): void {
