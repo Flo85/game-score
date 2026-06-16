@@ -1,6 +1,5 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { Share } from "@capacitor/share";
 import { defineStore } from "pinia";
 import { nanoid } from "nanoid";
 import type {
@@ -73,18 +72,11 @@ export const useFarawayGameStore = defineStore("game", {
 
       if (Capacitor.isNativePlatform()) {
         try {
-          const result = await Filesystem.writeFile({
+          await Filesystem.writeFile({
             data: json,
-            directory: Directory.Documents,
+            directory: Directory.ExternalStorage,
             encoding: Encoding.UTF8,
-            path: fileName,
-          });
-
-          await Share.share({
-            dialogTitle: "Partager le JSON d'historique",
-            text: "Voici l'historique des parties au format JSON.",
-            title: "Exporter l'historique",
-            url: result.uri ?? undefined,
+            path: `Download/${fileName}`,
           });
 
           return;
