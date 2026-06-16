@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { toastController } from "@ionic/vue";
 import { defineStore } from "pinia";
 import { nanoid } from "nanoid";
 import type {
@@ -70,6 +71,16 @@ export const useFarawayGameStore = defineStore("game", {
         .replace(/:/g, "-");
       const fileName = `faraway-history-${timestamp}.json`;
 
+      const showToast = async (message: string, color: "success" | "danger") => {
+        const toast = await toastController.create({
+          color,
+          duration: 3000,
+          message,
+          position: "bottom",
+        });
+        await toast.present();
+      };
+
       if (Capacitor.isNativePlatform()) {
         try {
           await Filesystem.writeFile({
@@ -79,9 +90,11 @@ export const useFarawayGameStore = defineStore("game", {
             path: `Download/${fileName}`,
           });
 
+          await showToast(`Fichier enregistré dans Téléchargements`, "success");
           return;
         } catch (error) {
           console.error("Export natif échoué:", error);
+          await showToast("Erreur lors de l'export", "danger");
         }
       }
 
@@ -95,6 +108,7 @@ export const useFarawayGameStore = defineStore("game", {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        await showToast(`Fichier téléchargé : ${fileName}`, "success");
       }
     },
 
