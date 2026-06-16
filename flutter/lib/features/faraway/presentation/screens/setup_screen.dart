@@ -17,10 +17,15 @@ class SetupScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Faraway — Nouvelle partie')),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Image.asset('assets/images/logo-faraway.png', height: 80),
+          ),
           Expanded(
             child: ReorderableListView.builder(
               itemCount: players.length,
               onReorderItem: notifier.reorder,
+              buildDefaultDragHandles: false,
               itemBuilder: (context, i) {
                 final player = players[i];
                 return ListTile(
@@ -37,7 +42,10 @@ class SetupScreen extends ConsumerWidget {
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => notifier.remove(player.id),
                       ),
-                      const Icon(Icons.drag_handle),
+                      ReorderableDragStartListener(
+                        index: i,
+                        child: const Icon(Icons.drag_handle),
+                      ),
                     ],
                   ),
                 );
