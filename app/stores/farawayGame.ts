@@ -165,14 +165,14 @@ export const useFarawayGameStore = defineStore("game", {
       this.createdAt = new Date().toISOString();
       this.id = nanoid();
       this.scores = this.players.reduce<ScoresType>((acc, player) => {
-        acc[player.id] = Array(9).fill(null);
+        acc[player.id] = Array(this.numberOfRows).fill(null);
         return acc;
       }, {});
       this.writable = true;
 
       await saveItem<GameListItemType>(
         {
-          createdAt: new Date().toISOString(),
+          createdAt: this.createdAt,
           id: this.id,
           numberOfRows: this.numberOfRows,
           players: this.players,

@@ -72,6 +72,7 @@ import {
   IonList,
   IonReorder,
   IonReorderGroup,
+  type ItemReorderEventDetail,
 } from "@ionic/vue";
 
 import { add, trash } from "ionicons/icons";
@@ -87,7 +88,7 @@ const addPlayer = async () => {
   farawayGameStore.addPlayer(`Joueur ${farawayGameStore.players.length + 1}`);
 };
 
-const reorderPlayers = (event: any) => {
+const reorderPlayers = (event: CustomEvent<ItemReorderEventDetail>) => {
   const from = event.detail.from;
   const to = event.detail.to;
 
