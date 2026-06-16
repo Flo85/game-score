@@ -7,8 +7,6 @@ import 'models.dart';
 
 part 'providers.g.dart';
 
-const _numberOfRows = 9;
-
 // ── Database & Repository ──────────────────────────────────────────────────────
 
 @Riverpod(keepAlive: true)
@@ -48,9 +46,8 @@ class CurrentGame extends _$CurrentGame {
       id: const Uuid().v4(),
       createdAt: DateTime.now(),
       players: trimmed,
-      scores: {for (final p in trimmed) p.id: List.filled(_numberOfRows, null)},
-      numberOfRows: _numberOfRows,
-      writable: true,
+      scores: {for (final p in trimmed) p.id: List.filled(farawayNumberOfRows, null)},
+      finished: false,
     );
     await repo.saveGame(game);
     state = game;
@@ -63,7 +60,7 @@ class CurrentGame extends _$CurrentGame {
 
   void setScore(String playerId, int row, int? value) {
     final game = state;
-    if (game == null || !game.writable) return;
+    if (game == null || game.finished) return;
 
     final newScores = Map<String, List<int?>>.from(
       game.scores.map((k, v) => MapEntry(k, List<int?>.from(v))),
@@ -89,7 +86,7 @@ class CurrentGame extends _$CurrentGame {
   Future<void> endGame() async {
     final game = state;
     if (game == null) return;
-    state = game.copyWith(writable: false);
+    state = game.copyWith(finished: true);
     await ref.read(farawayRepositoryProvider).saveGame(state!);
   }
 

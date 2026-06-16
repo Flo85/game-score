@@ -60,7 +60,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     final notifier = ref.read(currentGameProvider.notifier);
     final players = game.players;
-    final writable = game.writable;
+    final writable = !game.finished;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Feuille de score')),
@@ -92,7 +92,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               controller: _leftScroll,
                               child: Column(
                                 children: [
-                                  ...List.generate(game.numberOfRows - 1, (i) => _FixedCell(
+                                  ...List.generate(farawayNumberOfRows - 1, (i) => _FixedCell(
                                     borderTop: true,
                                     child: Text(
                                       '${i + 1}',
@@ -141,8 +141,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                   controller: _rightScroll,
                                   child: Column(
                                     children: [
-                                      ...List.generate(game.numberOfRows, (i) {
-                                        final isLast = i == game.numberOfRows - 1;
+                                      ...List.generate(farawayNumberOfRows, (i) {
+                                        final isLast = i == farawayNumberOfRows - 1;
                                         return _ScoreRow(
                                           row: i,
                                           players: players,

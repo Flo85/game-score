@@ -257,7 +257,7 @@ final class CurrentGameProvider
   }
 }
 
-String _$currentGameHash() => r'f0bceb4e89742a1bf4086365a0713da66be4f97b';
+String _$currentGameHash() => r'5855a62d2f53525ccb6468b79cb08e47b370dcaa';
 
 abstract class _$CurrentGame extends $Notifier<FarawayGame?> {
   FarawayGame? build();
@@ -309,7 +309,7 @@ final class SetupPlayersProvider
   }
 }
 
-String _$setupPlayersHash() => r'abc50b8d974d5ee961466cb781e5fbd0039c2e4e';
+String _$setupPlayersHash() => r'befb8e8654b7a8282681f7faf68e38bbd6ffb857';
 
 abstract class _$SetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();

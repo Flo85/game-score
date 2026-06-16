@@ -6,13 +6,22 @@ part 'app_database.g.dart';
 class Games extends Table {
   TextColumn get id => text()();
   DateTimeColumn get createdAt => dateTime()();
-  IntColumn get numberOfRows => integer().withDefault(const Constant(9))();
-  BoolColumn get writable => boolean()();
-  TextColumn get playersJson => text()();
-  TextColumn get scoresJson => text()();
+  TextColumn get gameType => text().withDefault(const Constant('faraway'))();
+  BoolColumn get finished => boolean()();
 
   @override
   Set<Column> get primaryKey => {id};
+}
+
+class GamePlayers extends Table {
+  TextColumn get gameId => text().references(Games, #id, onDelete: KeyAction.cascade)();
+  TextColumn get playerId => text()(); // id du carnet si joueur enregistré, uuid temporaire sinon
+  TextColumn get playerName => text()(); // snapshot du nom au moment de la partie
+  IntColumn get position => integer()(); // ordre dans la partie
+  TextColumn get scoresJson => text().withDefault(const Constant('[]'))(); // scores du joueur
+
+  @override
+  Set<Column> get primaryKey => {gameId, position};
 }
 
 class SavedPlayers extends Table {
@@ -23,19 +32,12 @@ class SavedPlayers extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Games, SavedPlayers])
+@DriftDatabase(tables: [Games, GamePlayers, SavedPlayers])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
-
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-    onUpgrade: (m, from, to) async {
-      if (from < 2) await m.createTable(savedPlayers);
-    },
-  );
+  int get schemaVersion => 1;
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'faraway_game');
@@ -54,6 +56,19 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteGame(String id) =>
       (delete(games)..where((g) => g.id.equals(id))).go();
+
+  // ── GamePlayers ───────────────────────────────────────────────────────────────
+
+  Future<void> replaceGamePlayers(String gameId, List<GamePlayersCompanion> rows) async {
+    await (delete(gamePlayers)..where((gp) => gp.gameId.equals(gameId))).go();
+    await batch((b) => b.insertAll(gamePlayers, rows));
+  }
+
+  Future<List<GamePlayer>> getGamePlayers(String gameId) =>
+      (select(gamePlayers)
+            ..where((gp) => gp.gameId.equals(gameId))
+            ..orderBy([(gp) => OrderingTerm.asc(gp.position)]))
+          .get();
 
   // ── SavedPlayers ──────────────────────────────────────────────────────────────
 

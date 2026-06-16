@@ -52,7 +52,7 @@ class HistoryScreen extends ConsumerWidget {
 
               return ListTile(
                 title: Text(label),
-                subtitle: Text('${game.players.length} joueurs${game.writable ? ' — en cours' : ''}'),
+                subtitle: Text('${game.players.length} joueurs${game.finished ? '' : ' — en cours'}'),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
