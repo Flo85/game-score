@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/faraway/presentation/screens/setup_screen.dart';
+import 'presentation/screens/home_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const ProviderScope(child: GameScoreApp()));
 }
 
@@ -23,7 +29,7 @@ class GameScoreApp extends StatelessWidget {
           foregroundColor: Colors.black,
         ),
       ),
-      home: const SetupScreen(),
+      home: const HomeScreen(),
     );
   }
 }

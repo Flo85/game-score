@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../features/faraway/presentation/screens/saved_players_screen.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
-import 'game_screen.dart';
-import 'history_screen.dart';
-import 'saved_players_screen.dart';
+import 'generic_game_screen.dart';
+import 'generic_history_screen.dart';
 
-class SetupScreen extends ConsumerWidget {
-  const SetupScreen({super.key});
+class GenericSetupScreen extends ConsumerWidget {
+  const GenericSetupScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final players = ref.watch(setupPlayersProvider);
-    final notifier = ref.read(setupPlayersProvider.notifier);
+    final players = ref.watch(genericSetupPlayersProvider);
+    final notifier = ref.read(genericSetupPlayersProvider.notifier);
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
-    final isMaxReached = players.length >= 7;
+    final gameName = ref.watch(genericSetupNameProvider);
+    final canStart = players.isNotEmpty && gameName.trim().isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -32,18 +33,26 @@ class SetupScreen extends ConsumerWidget {
             tooltip: 'Historique',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              MaterialPageRoute(builder: (_) => const GenericHistoryScreen()),
             ),
           ),
           TextButton(
-            onPressed: players.isEmpty
-                ? null
-                : () async {
-                    await ref.read(currentGameProvider.notifier).newGame(players);
+            onPressed: canStart
+                ? () async {
+                    final trimmedPlayers = players
+                        .map((p) => p.copyWith(name: p.name.trim()))
+                        .toList();
+                    await ref
+                        .read(currentGenericGameProvider.notifier)
+                        .newGame(gameName.trim(), trimmedPlayers);
                     if (context.mounted) {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const GenericGameScreen()),
+                      );
                     }
-                  },
+                  }
+                : null,
             child: const Text('Commencer'),
           ),
         ],
@@ -51,7 +60,6 @@ class SetupScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset('assets/images/logo-faraway.png', width: double.infinity, fit: BoxFit.fitWidth),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(
@@ -60,12 +68,16 @@ class SetupScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: Text(
-              'Maximum de 7 joueurs',
-              style: TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: 'Nom du jeu',
+                hintText: 'ex : Uno, Catan, Skyjo…',
+                border: OutlineInputBorder(),
+              ),
+              textCapitalization: TextCapitalization.words,
+              onChanged: (v) => ref.read(genericSetupNameProvider.notifier).set(v),
             ),
           ),
           Expanded(
@@ -83,7 +95,6 @@ class SetupScreen extends ConsumerWidget {
                     savedPlayers: savedPlayers,
                     currentPlayers: players,
                     onChanged: (name) {
-                      // Si le nom ne correspond plus au joueur du carnet, on détache l'id
                       final isSavedPlayer = savedPlayers.any((s) => s.id == player.id);
                       if (isSavedPlayer && name != player.name) {
                         notifier.setPlayer(player.id, Player.create(name));
@@ -112,17 +123,15 @@ class SetupScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: isMaxReached
-          ? null
-          : FloatingActionButton(
-              onPressed: notifier.add,
-              child: const Icon(Icons.add),
-            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: notifier.add,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
 
-// ── Champ nom avec autocomplete ───────────────────────────────────────────────
+// ── Champ nom avec autocomplete (identique au setup Faraway) ──────────────────
 
 class _PlayerNameField extends StatelessWidget {
   final Player player;
@@ -155,17 +164,17 @@ class _PlayerNameField extends StatelessWidget {
         final query = value.text.toLowerCase();
         if (query.isEmpty) return [];
         return savedPlayers.where(
-          (p) => p.name.toLowerCase().contains(query) && !takenNames.contains(p.name.toLowerCase()),
+          (p) =>
+              p.name.toLowerCase().contains(query) &&
+              !takenNames.contains(p.name.toLowerCase()),
         );
       },
       onSelected: onSavedPlayerSelected,
       fieldViewBuilder: (context, controller, focusNode, _) {
         focusNode.addListener(() {
           if (focusNode.hasFocus) {
-            controller.selection = TextSelection(
-              baseOffset: 0,
-              extentOffset: controller.text.length,
-            );
+            controller.selection =
+                TextSelection(baseOffset: 0, extentOffset: controller.text.length);
           } else {
             final trimmed = controller.text.trim();
             if (trimmed != controller.text) {

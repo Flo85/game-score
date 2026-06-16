@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
@@ -29,7 +28,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     _leftScroll = ScrollController();
     _rightScroll = ScrollController();
     _leftScroll.addListener(() => _sync(_leftScroll, _rightScroll));
@@ -45,7 +43,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     _leftScroll.dispose();
     _rightScroll.dispose();
     super.dispose();

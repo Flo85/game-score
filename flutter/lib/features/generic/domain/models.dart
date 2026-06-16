@@ -1,34 +1,35 @@
 import '../../../core/models/player.dart';
 export '../../../core/models/player.dart';
 
-const farawayNumberOfRows = 9;
-
-class FarawayGame {
+class GenericGame {
   final String id;
+  final String name;
   final DateTime createdAt;
-  final String gameType;
   final List<Player> players;
-  final Map<String, List<int?>> scores;
+  final Map<String, List<int?>> scores; // playerId → score par manche
   final bool finished;
 
-  FarawayGame({
+  GenericGame({
     required this.id,
+    required this.name,
     required this.createdAt,
-    this.gameType = 'faraway',
     required this.players,
     required this.scores,
     required this.finished,
   });
 
-  FarawayGame copyWith({
+  int get numberOfRounds => scores.values.isEmpty ? 0 : scores.values.first.length;
+
+  GenericGame copyWith({
+    String? name,
     List<Player>? players,
     Map<String, List<int?>>? scores,
     bool? finished,
   }) =>
-      FarawayGame(
+      GenericGame(
         id: id,
+        name: name ?? this.name,
         createdAt: createdAt,
-        gameType: gameType,
         players: players ?? this.players,
         scores: scores ?? this.scores,
         finished: finished ?? this.finished,
@@ -42,23 +43,24 @@ class FarawayGame {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'name': name,
         'createdAt': createdAt.toIso8601String(),
-        'gameType': gameType,
+        'gameType': 'generic',
         'players': players.map((p) => p.toJson()).toList(),
         'scores': scores.map((k, v) => MapEntry(k, v)),
         'finished': finished,
       };
 
-  factory FarawayGame.fromJson(Map<String, dynamic> json) => FarawayGame(
+  factory GenericGame.fromJson(Map<String, dynamic> json) => GenericGame(
         id: json['id'] as String,
+        name: json['name'] as String? ?? '',
         createdAt: DateTime.parse(json['createdAt'] as String),
-        gameType: json['gameType'] as String? ?? 'faraway',
         players: (json['players'] as List)
             .map((p) => Player.fromJson(p as Map<String, dynamic>))
             .toList(),
         scores: (json['scores'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
         ),
-        finished: json['finished'] as bool? ?? !(json['writable'] as bool? ?? true),
+        finished: json['finished'] as bool? ?? false,
       );
 }

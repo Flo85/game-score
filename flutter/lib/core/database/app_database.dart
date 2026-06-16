@@ -7,6 +7,7 @@ class Games extends Table {
   TextColumn get id => text()();
   DateTimeColumn get createdAt => dateTime()();
   TextColumn get gameType => text().withDefault(const Constant('faraway'))();
+  TextColumn get name => text().nullable()(); // nom personnalisé pour les jeux génériques
   BoolColumn get finished => boolean()();
 
   @override
@@ -47,6 +48,12 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Game>> watchAllGames() =>
       (select(games)..orderBy([(g) => OrderingTerm.desc(g.createdAt)])).watch();
+
+  Stream<List<Game>> watchGamesByType(String type) =>
+      (select(games)
+            ..where((g) => g.gameType.equals(type))
+            ..orderBy([(g) => OrderingTerm.desc(g.createdAt)]))
+          .watch();
 
   Future<Game?> getGame(String id) =>
       (select(games)..where((g) => g.id.equals(id))).getSingleOrNull();
