@@ -97,6 +97,93 @@ final class FarawayRepositoryProvider
 
 String _$farawayRepositoryHash() => r'61f061bf9856cb0424bd355a8a8b65c1c80beef3';
 
+@ProviderFor(savedPlayersRepository)
+final savedPlayersRepositoryProvider = SavedPlayersRepositoryProvider._();
+
+final class SavedPlayersRepositoryProvider
+    extends
+        $FunctionalProvider<
+          SavedPlayersRepository,
+          SavedPlayersRepository,
+          SavedPlayersRepository
+        >
+    with $Provider<SavedPlayersRepository> {
+  SavedPlayersRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'savedPlayersRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$savedPlayersRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<SavedPlayersRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  SavedPlayersRepository create(Ref ref) {
+    return savedPlayersRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SavedPlayersRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SavedPlayersRepository>(value),
+    );
+  }
+}
+
+String _$savedPlayersRepositoryHash() =>
+    r'6e02d9b106dad5e20f8c8f501edd8c8b514c8133';
+
+@ProviderFor(savedPlayersList)
+final savedPlayersListProvider = SavedPlayersListProvider._();
+
+final class SavedPlayersListProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Player>>,
+          List<Player>,
+          Stream<List<Player>>
+        >
+    with $FutureModifier<List<Player>>, $StreamProvider<List<Player>> {
+  SavedPlayersListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'savedPlayersListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$savedPlayersListHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<Player>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<Player>> create(Ref ref) {
+    return savedPlayersList(ref);
+  }
+}
+
+String _$savedPlayersListHash() => r'bd7247c3f228a0037881e3028da073697f85ed27';
+
 @ProviderFor(gameHistory)
 final gameHistoryProvider = GameHistoryProvider._();
 
@@ -222,7 +309,7 @@ final class SetupPlayersProvider
   }
 }
 
-String _$setupPlayersHash() => r'96dff19c4d64900d844cb46098f551b4ad194589';
+String _$setupPlayersHash() => r'abc50b8d974d5ee961466cb781e5fbd0039c2e4e';
 
 abstract class _$SetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();
