@@ -13,13 +13,54 @@ class SetupScreen extends ConsumerWidget {
     final notifier = ref.read(setupPlayersProvider.notifier);
     final isMaxReached = players.length >= 7;
 
+    final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Faraway — Nouvelle partie')),
+      appBar: AppBar(
+        title: isLandscape ? const Text('Faraway — Nouvelle partie') : null,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Historique',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+            ),
+          ),
+          TextButton(
+            onPressed: players.isEmpty
+                ? null
+                : () async {
+                    await ref.read(currentGameProvider.notifier).newGame(players);
+                    if (context.mounted) {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
+                    }
+                  },
+            child: const Text('Commencer'),
+          ),
+        ],
+      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Image.asset('assets/images/logo-faraway.png', height: 80),
+          if (!isLandscape) ...[
+            Image.asset('assets/images/logo-faraway.png', width: double.infinity, fit: BoxFit.fitWidth),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Text(
+                'Nouvelle partie',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Maximum de 7 joueurs',
+              style: TextStyle(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             child: ReorderableListView.builder(
@@ -50,33 +91,6 @@ class SetupScreen extends ConsumerWidget {
                   ),
                 );
               },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                FilledButton(
-                  onPressed: players.isEmpty
-                      ? null
-                      : () async {
-                          await ref.read(currentGameProvider.notifier).newGame(players);
-                          if (context.mounted) {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
-                          }
-                        },
-                  child: const Text('Commencer la partie'),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HistoryScreen()),
-                  ),
-                  child: const Text('Historique'),
-                ),
-              ],
             ),
           ),
         ],

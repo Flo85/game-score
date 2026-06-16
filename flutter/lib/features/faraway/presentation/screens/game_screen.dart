@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
@@ -28,6 +29,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     _leftScroll = ScrollController();
     _rightScroll = ScrollController();
     _leftScroll.addListener(() => _sync(_leftScroll, _rightScroll));
@@ -43,6 +45,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     _leftScroll.dispose();
     _rightScroll.dispose();
     super.dispose();
@@ -325,9 +328,10 @@ class _ScoreRow extends StatelessWidget {
             borderRight: p != players.last,
             color: bg,
             child: _ScoreInput(
+              key: ValueKey('${p.id}-$row'),
               playerId: p.id,
               row: row,
-              game: game,
+              score: game.scores[p.id]?[row],
               writable: writable,
               notifier: notifier,
             ),
@@ -371,27 +375,55 @@ class _TotalRow extends StatelessWidget {
 
 // ── Input score ───────────────────────────────────────────────────────────────
 
-class _ScoreInput extends StatelessWidget {
+class _ScoreInput extends StatefulWidget {
   final String playerId;
   final int row;
-  final FarawayGame game;
+  final int? score;
   final bool writable;
   final CurrentGame notifier;
 
   const _ScoreInput({
+    super.key,
     required this.playerId,
     required this.row,
-    required this.game,
+    required this.score,
     required this.writable,
     required this.notifier,
   });
 
   @override
+  State<_ScoreInput> createState() => _ScoreInputState();
+}
+
+class _ScoreInputState extends State<_ScoreInput> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.score?.toString() ?? '');
+  }
+
+  @override
+  void didUpdateWidget(_ScoreInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newText = widget.score?.toString() ?? '';
+    if (_controller.text != newText) {
+      _controller.value = _controller.value.copyWith(text: newText);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final score = game.scores[playerId]?[row];
     return TextField(
-      controller: TextEditingController(text: score?.toString() ?? ''),
-      enabled: writable,
+      controller: _controller,
+      enabled: widget.writable,
       textAlign: TextAlign.center,
       keyboardType: TextInputType.number,
       style: const TextStyle(fontSize: 18),
@@ -400,7 +432,7 @@ class _ScoreInput extends StatelessWidget {
         isDense: true,
         contentPadding: EdgeInsets.zero,
       ),
-      onChanged: (v) => notifier.setScore(playerId, row, int.tryParse(v)),
+      onChanged: (v) => widget.notifier.setScore(widget.playerId, widget.row, int.tryParse(v)),
     );
   }
 }
