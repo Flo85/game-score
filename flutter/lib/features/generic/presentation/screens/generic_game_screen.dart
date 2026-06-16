@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models.dart';
 import '../../domain/providers.dart';
 
 const _colFixedWidth = 64.0;

@@ -1,12 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/database/app_database.dart';
-import '../../../core/models/player.dart';
-import '../../../features/faraway/domain/providers.dart' show appDatabaseProvider, savedPlayersRepositoryProvider, savedPlayersListProvider;
+import '../../../features/faraway/domain/providers.dart' show appDatabaseProvider;
 import '../data/generic_repository.dart';
 import 'models.dart';
 
-export '../../../features/faraway/domain/providers.dart' show savedPlayersRepositoryProvider, savedPlayersListProvider;
+export '../../../features/faraway/domain/providers.dart' show savedPlayersListProvider, savedPlayersRepositoryProvider;
 
 part 'providers.g.dart';
 
