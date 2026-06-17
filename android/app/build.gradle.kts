@@ -12,7 +12,7 @@ if (keyPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.gamescore.game_score"
+    namespace = "com.florian.gamescore"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.gamescore.game_score"
+        applicationId = "com.florian.gamescore"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -39,6 +39,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".dev"
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
         }

@@ -1,4 +1,4 @@
-package com.gamescore.game_score
+package com.florian.gamescore
 
 import io.flutter.embedding.android.FlutterActivity
 
