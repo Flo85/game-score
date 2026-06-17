@@ -5,11 +5,6 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  ANDROID_HOME: /usr/local/lib/android/sdk
-  PATH: /usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools:/usr/local/lib/android/sdk/build-tools/34.0.0:/usr/bin:/bin
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,88 +13,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # 🟢 Installer le SDK Android + sdkmanager
-      - name: Install Android SDK
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-          sudo mkdir -p $ANDROID_HOME/cmdline-tools
-          sudo unzip cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
-          sudo mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-      # 🟢 Installer les Build Tools 34
-      - name: Install Android Build Tools
-        run: |
-          yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0"
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
 
       - name: Install dependencies
-        run: npm ci
+        run: flutter pub get
 
-      - name: Build Nuxt (SPA)
-        run: npm run build
-
-      - name: Sync Capacitor Android
-        run: |
-          npm install @capacitor/android
-          npx cap sync android
-
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-
-      # 🟢 versionCode auto
       - name: Auto-increment versionCode
         run: |
           VERSION_CODE=$GITHUB_RUN_NUMBER
           sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" android/app/build.gradle
           echo "New versionCode: $VERSION_CODE"
 
-      # 🟢 Décoder le keystore
       - name: Decode keystore
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/release.keystore
 
-      # 🟢 Build Release APK
       - name: Build Release APK
-        run: |
-          cd android
-          ./gradlew assembleRelease
-
-      # 🟢 Align + Sign APK (méthode officielle)
-      - name: Align and Sign APK
-        run: |
-          cd android/app/build/outputs/apk/release
-
-          # Trouver automatiquement l'APK généré
-          APK=$(ls *.apk | head -n 1)
-
-          echo "APK trouvé : $APK"
-
-          mv "$APK" unsigned.apk
-
-          zipalign -v -p 4 unsigned.apk aligned.apk
-
-          apksigner sign \
-            --ks ../../../../release.keystore \
-            --ks-key-alias "${{ secrets.ANDROID_KEY_ALIAS }}" \
-            --ks-pass pass:"${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
-            --key-pass pass:"${{ secrets.ANDROID_KEY_PASSWORD }}" \
-            --out app-release-signed.apk \
-            aligned.apk
+        run: flutter build apk --release
+        env:
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
 
       - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-signed
-          path: android/app/build/outputs/apk/release/app-release-signed.apk
+          path: build/app/outputs/flutter-apk/app-release.apk

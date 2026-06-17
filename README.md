@@ -1,75 +1,61 @@
-# Nuxt Minimal Starter
+# Game Score
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Application mobile Android de suivi de scores pour jeux de société, développée en Flutter.
 
-## Setup
+## Fonctionnalités
 
-Make sure to install dependencies:
+- **Faraway** — feuille de score dédiée au jeu de cartes Faraway (9 lignes, sanctuaire, icônes du jeu)
+- **Jeu libre** — suivi de scores par manche pour n'importe quel jeu, nombre de manches illimité
+- **Carnet de joueurs** — sauvegarde des joueurs fréquents avec autocomplétion à la création de partie
+- **Historique** — consultation et suppression des parties passées par type de jeu
+- **Export JSON** — export de l'historique Faraway dans le dossier Téléchargements
 
-```bash
-# npm
-npm install
+## Stack technique
 
-# pnpm
-pnpm install
+- **Flutter** 3.x / Dart
+- **Riverpod** (riverpod_annotation + riverpod_generator) — gestion d'état
+- **Drift** (drift_flutter) — base de données SQLite locale
+- **path_provider** — accès au système de fichiers
 
-# yarn
-yarn install
+## Structure du projet
 
-# bun
-bun install
+```
+lib/
+├── core/
+│   ├── database/        # Schéma Drift et méthodes DB
+│   └── models/          # Modèles partagés (Player)
+├── features/
+│   ├── faraway/         # Jeu Faraway (domain, data, presentation)
+│   └── generic/         # Jeu libre (domain, data, presentation)
+└── presentation/
+    └── screens/         # Écran d'accueil
 ```
 
-## Development Server
+## Base de données
 
-Start the development server on `http://localhost:3000`:
+| Table | Colonnes |
+|---|---|
+| `games` | `id`, `created_at`, `game_type`, `name`, `finished` |
+| `game_players` | `game_id`, `player_id`, `player_name`, `position`, `scores_json` |
+| `saved_players` | `id`, `name` |
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
+## Lancer le projet
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+flutter pub get
+dart run build_runner build
+flutter run
 ```
 
-Locally preview production build:
+## Build release
 
-```bash
-# npm
-npm run preview
+Le workflow GitHub Actions `.github/workflows/android.yml` génère automatiquement un APK signé à chaque push sur `main`. Les secrets à configurer dans le dépôt :
 
-# pnpm
-pnpm preview
+| Secret | Description |
+|---|---|
+| `ANDROID_KEYSTORE` | Keystore encodé en base64 |
+| `ANDROID_KEY_ALIAS` | Alias de la clé |
+| `ANDROID_KEYSTORE_PASSWORD` | Mot de passe du keystore |
+| `ANDROID_KEY_PASSWORD` | Mot de passe de la clé |
 
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Pour générer le keystore, utiliser le workflow `generate-keystore.yml` (déclenchement manuel).
