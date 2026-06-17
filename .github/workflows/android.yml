@@ -30,7 +30,7 @@ jobs:
       - name: Auto-increment versionCode
         run: |
           VERSION_CODE=$GITHUB_RUN_NUMBER
-          sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" android/app/build.gradle
+          sed -i "s/^version: .*/version: 1.0.0+$VERSION_CODE/" pubspec.yaml
           echo "New versionCode: $VERSION_CODE"
 
       - name: Decode keystore
