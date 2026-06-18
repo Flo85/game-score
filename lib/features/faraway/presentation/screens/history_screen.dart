@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/providers.dart';
@@ -15,6 +16,40 @@ class HistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Historique'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.upload_file),
+            tooltip: 'Importer un JSON',
+            onPressed: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['json'],
+              );
+              if (result == null || result.files.single.path == null) return;
+              if (!context.mounted) return;
+              try {
+                final count = await repo.importHistory(result.files.single.path!);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(count > 0
+                          ? '$count partie${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}'
+                          : 'Aucune nouvelle partie à importer'),
+                      backgroundColor: count > 0 ? Colors.green : Colors.orange,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erreur lors de l\'import : $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.download),
             tooltip: 'Exporter en JSON',
