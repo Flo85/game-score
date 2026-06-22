@@ -120,8 +120,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                         ],
                       ),
                     ),
-                    // ── Séparateur ─────────────────────────────────────────
-                    Container(width: 0.5, color: _colorBorder),
                     // ── Colonnes joueurs (scrollables) ─────────────────────
                     Expanded(
                       child: SingleChildScrollView(
@@ -209,7 +207,10 @@ class _FixedHeaderCell extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: _rowHeight),
       decoration: BoxDecoration(
         color: color,
-        border: const Border(bottom: BorderSide(color: _colorBorder, width: 0.5)),
+        border: const Border(
+          bottom: BorderSide(color: _colorBorder, width: 0.5),
+          right: BorderSide(color: _colorBorder, width: 0.5),
+        ),
       ),
       alignment: Alignment.center,
       child: child,
@@ -241,6 +242,7 @@ class _FixedCell extends StatelessWidget {
         color: color,
         border: Border(
           top: borderTop ? BorderSide(color: _colorBorder, width: borderTopWidth) : BorderSide.none,
+          right: const BorderSide(color: _colorBorder, width: 0.5),
         ),
       ),
       alignment: Alignment.center,
