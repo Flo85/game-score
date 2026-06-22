@@ -89,7 +89,7 @@ final class CurrentGenericGameProvider
 }
 
 String _$currentGenericGameHash() =>
-    r'e37c1a7f8683bd4ffe4f50ed69419e8953749c63';
+    r'd8431becd2bc56be127bd5590660ffd629baaf65';
 
 abstract class _$CurrentGenericGame extends $Notifier<GenericGame?> {
   GenericGame? build();
@@ -274,6 +274,59 @@ abstract class _$GenericSetupName extends $Notifier<String> {
             as $ClassProviderElement<
               AnyNotifier<String, String>,
               String,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(GenericSetupVictoryType)
+final genericSetupVictoryTypeProvider = GenericSetupVictoryTypeProvider._();
+
+final class GenericSetupVictoryTypeProvider
+    extends $NotifierProvider<GenericSetupVictoryType, VictoryType> {
+  GenericSetupVictoryTypeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'genericSetupVictoryTypeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$genericSetupVictoryTypeHash();
+
+  @$internal
+  @override
+  GenericSetupVictoryType create() => GenericSetupVictoryType();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VictoryType value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VictoryType>(value),
+    );
+  }
+}
+
+String _$genericSetupVictoryTypeHash() =>
+    r'e3a6ea25820aa9996bcaad703ddda16bd844e94c';
+
+abstract class _$GenericSetupVictoryType extends $Notifier<VictoryType> {
+  VictoryType build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<VictoryType, VictoryType>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<VictoryType, VictoryType>,
+              VictoryType,
               Object?,
               Object?
             >;

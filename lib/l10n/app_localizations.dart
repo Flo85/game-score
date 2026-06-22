@@ -422,6 +422,24 @@ abstract class AppLocalizations {
   /// **'No finished games'**
   String get noFinishedGame;
 
+  /// No description provided for @victoryType.
+  ///
+  /// In en, this message translates to:
+  /// **'Victory type'**
+  String get victoryType;
+
+  /// No description provided for @highestScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest score'**
+  String get highestScore;
+
+  /// No description provided for @lowestScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest score'**
+  String get lowestScore;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

@@ -32,7 +32,8 @@ class GenericRepository {
       gameType: const Value('generic'),
       name: Value(game.name),
       finished: Value(game.finished),
-      winnerId: Value(game.winnerId),
+      winnerId: Value(game.winnerIds.isEmpty ? null : game.winnerIds.join(',')),
+      victoryType: Value(game.victoryType.name),
     ));
 
     await _db.replaceGamePlayers(
@@ -66,18 +67,26 @@ class GenericRepository {
       players: players,
       scores: scores,
       finished: row.finished,
-      winnerId: row.winnerId,
+      winnerIds: row.winnerId?.split(',').where((s) => s.isNotEmpty).toList() ?? [],
+      victoryType: VictoryType.values.asNameMap()[row.victoryType ?? ''] ?? VictoryType.highestScore,
     );
   }
 
-  static String? computeWinner(GenericGame game) {
-    if (game.players.isEmpty) return null;
-    String? winner;
-    int best = -1;
+  static List<String> computeWinner(GenericGame game) {
+    if (game.players.isEmpty) return [];
+    final lowest = game.victoryType == VictoryType.lowestScore;
+    int? best;
     for (final p in game.players) {
-      final total = (game.scores[p.id] ?? []).whereType<int>().fold(0, (a, b) => a + b);
-      if (total > best) { best = total; winner = p.id; }
+      final scores = game.scores[p.id] ?? [];
+      if (scores.every((v) => v == null)) continue;
+      final total = scores.whereType<int>().fold(0, (a, b) => a + b);
+      if (best == null || (lowest ? total < best : total > best)) best = total;
     }
-    return winner;
+    if (best == null) return [];
+    return game.players.where((p) {
+      final scores = game.scores[p.id] ?? [];
+      if (scores.every((v) => v == null)) return false;
+      return scores.whereType<int>().fold(0, (a, b) => a + b) == best;
+    }).map((p) => p.id).toList();
   }
 }

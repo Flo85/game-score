@@ -211,6 +211,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noFinishedGame => 'Aucune partie terminée';
 
   @override
+  String get victoryType => 'Type de victoire';
+
+  @override
+  String get highestScore => 'Score le plus élevé';
+
+  @override
+  String get lowestScore => 'Score le plus bas';
+
+  @override
   String get language => 'Langue';
 
   @override

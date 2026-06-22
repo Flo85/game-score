@@ -74,6 +74,17 @@ class $GamesTable extends Games with TableInfo<$GamesTable, Game> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _victoryTypeMeta = const VerificationMeta(
+    'victoryType',
+  );
+  @override
+  late final GeneratedColumn<String> victoryType = GeneratedColumn<String>(
+    'victory_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -82,6 +93,7 @@ class $GamesTable extends Games with TableInfo<$GamesTable, Game> {
     name,
     finished,
     winnerId,
+    victoryType,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -134,6 +146,15 @@ class $GamesTable extends Games with TableInfo<$GamesTable, Game> {
         winnerId.isAcceptableOrUnknown(data['winner_id']!, _winnerIdMeta),
       );
     }
+    if (data.containsKey('victory_type')) {
+      context.handle(
+        _victoryTypeMeta,
+        victoryType.isAcceptableOrUnknown(
+          data['victory_type']!,
+          _victoryTypeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -167,6 +188,10 @@ class $GamesTable extends Games with TableInfo<$GamesTable, Game> {
         DriftSqlType.string,
         data['${effectivePrefix}winner_id'],
       ),
+      victoryType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}victory_type'],
+      ),
     );
   }
 
@@ -183,6 +208,7 @@ class Game extends DataClass implements Insertable<Game> {
   final String? name;
   final bool finished;
   final String? winnerId;
+  final String? victoryType;
   const Game({
     required this.id,
     required this.createdAt,
@@ -190,6 +216,7 @@ class Game extends DataClass implements Insertable<Game> {
     this.name,
     required this.finished,
     this.winnerId,
+    this.victoryType,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -204,6 +231,9 @@ class Game extends DataClass implements Insertable<Game> {
     if (!nullToAbsent || winnerId != null) {
       map['winner_id'] = Variable<String>(winnerId);
     }
+    if (!nullToAbsent || victoryType != null) {
+      map['victory_type'] = Variable<String>(victoryType);
+    }
     return map;
   }
 
@@ -217,6 +247,9 @@ class Game extends DataClass implements Insertable<Game> {
       winnerId: winnerId == null && nullToAbsent
           ? const Value.absent()
           : Value(winnerId),
+      victoryType: victoryType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(victoryType),
     );
   }
 
@@ -232,6 +265,7 @@ class Game extends DataClass implements Insertable<Game> {
       name: serializer.fromJson<String?>(json['name']),
       finished: serializer.fromJson<bool>(json['finished']),
       winnerId: serializer.fromJson<String?>(json['winnerId']),
+      victoryType: serializer.fromJson<String?>(json['victoryType']),
     );
   }
   @override
@@ -244,6 +278,7 @@ class Game extends DataClass implements Insertable<Game> {
       'name': serializer.toJson<String?>(name),
       'finished': serializer.toJson<bool>(finished),
       'winnerId': serializer.toJson<String?>(winnerId),
+      'victoryType': serializer.toJson<String?>(victoryType),
     };
   }
 
@@ -254,6 +289,7 @@ class Game extends DataClass implements Insertable<Game> {
     Value<String?> name = const Value.absent(),
     bool? finished,
     Value<String?> winnerId = const Value.absent(),
+    Value<String?> victoryType = const Value.absent(),
   }) => Game(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
@@ -261,6 +297,7 @@ class Game extends DataClass implements Insertable<Game> {
     name: name.present ? name.value : this.name,
     finished: finished ?? this.finished,
     winnerId: winnerId.present ? winnerId.value : this.winnerId,
+    victoryType: victoryType.present ? victoryType.value : this.victoryType,
   );
   Game copyWithCompanion(GamesCompanion data) {
     return Game(
@@ -270,6 +307,9 @@ class Game extends DataClass implements Insertable<Game> {
       name: data.name.present ? data.name.value : this.name,
       finished: data.finished.present ? data.finished.value : this.finished,
       winnerId: data.winnerId.present ? data.winnerId.value : this.winnerId,
+      victoryType: data.victoryType.present
+          ? data.victoryType.value
+          : this.victoryType,
     );
   }
 
@@ -281,14 +321,22 @@ class Game extends DataClass implements Insertable<Game> {
           ..write('gameType: $gameType, ')
           ..write('name: $name, ')
           ..write('finished: $finished, ')
-          ..write('winnerId: $winnerId')
+          ..write('winnerId: $winnerId, ')
+          ..write('victoryType: $victoryType')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, createdAt, gameType, name, finished, winnerId);
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    gameType,
+    name,
+    finished,
+    winnerId,
+    victoryType,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -298,7 +346,8 @@ class Game extends DataClass implements Insertable<Game> {
           other.gameType == this.gameType &&
           other.name == this.name &&
           other.finished == this.finished &&
-          other.winnerId == this.winnerId);
+          other.winnerId == this.winnerId &&
+          other.victoryType == this.victoryType);
 }
 
 class GamesCompanion extends UpdateCompanion<Game> {
@@ -308,6 +357,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
   final Value<String?> name;
   final Value<bool> finished;
   final Value<String?> winnerId;
+  final Value<String?> victoryType;
   final Value<int> rowid;
   const GamesCompanion({
     this.id = const Value.absent(),
@@ -316,6 +366,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
     this.name = const Value.absent(),
     this.finished = const Value.absent(),
     this.winnerId = const Value.absent(),
+    this.victoryType = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   GamesCompanion.insert({
@@ -325,6 +376,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
     this.name = const Value.absent(),
     required bool finished,
     this.winnerId = const Value.absent(),
+    this.victoryType = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        createdAt = Value(createdAt),
@@ -336,6 +388,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
     Expression<String>? name,
     Expression<bool>? finished,
     Expression<String>? winnerId,
+    Expression<String>? victoryType,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -345,6 +398,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
       if (name != null) 'name': name,
       if (finished != null) 'finished': finished,
       if (winnerId != null) 'winner_id': winnerId,
+      if (victoryType != null) 'victory_type': victoryType,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -356,6 +410,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
     Value<String?>? name,
     Value<bool>? finished,
     Value<String?>? winnerId,
+    Value<String?>? victoryType,
     Value<int>? rowid,
   }) {
     return GamesCompanion(
@@ -365,6 +420,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
       name: name ?? this.name,
       finished: finished ?? this.finished,
       winnerId: winnerId ?? this.winnerId,
+      victoryType: victoryType ?? this.victoryType,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -390,6 +446,9 @@ class GamesCompanion extends UpdateCompanion<Game> {
     if (winnerId.present) {
       map['winner_id'] = Variable<String>(winnerId.value);
     }
+    if (victoryType.present) {
+      map['victory_type'] = Variable<String>(victoryType.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -405,6 +464,7 @@ class GamesCompanion extends UpdateCompanion<Game> {
           ..write('name: $name, ')
           ..write('finished: $finished, ')
           ..write('winnerId: $winnerId, ')
+          ..write('victoryType: $victoryType, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1020,6 +1080,7 @@ typedef $$GamesTableCreateCompanionBuilder =
       Value<String?> name,
       required bool finished,
       Value<String?> winnerId,
+      Value<String?> victoryType,
       Value<int> rowid,
     });
 typedef $$GamesTableUpdateCompanionBuilder =
@@ -1030,6 +1091,7 @@ typedef $$GamesTableUpdateCompanionBuilder =
       Value<String?> name,
       Value<bool> finished,
       Value<String?> winnerId,
+      Value<String?> victoryType,
       Value<int> rowid,
     });
 
@@ -1091,6 +1153,11 @@ class $$GamesTableFilterComposer extends Composer<_$AppDatabase, $GamesTable> {
 
   ColumnFilters<String> get winnerId => $composableBuilder(
     column: $table.winnerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get victoryType => $composableBuilder(
+    column: $table.victoryType,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1158,6 +1225,11 @@ class $$GamesTableOrderingComposer
     column: $table.winnerId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get victoryType => $composableBuilder(
+    column: $table.victoryType,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$GamesTableAnnotationComposer
@@ -1186,6 +1258,11 @@ class $$GamesTableAnnotationComposer
 
   GeneratedColumn<String> get winnerId =>
       $composableBuilder(column: $table.winnerId, builder: (column) => column);
+
+  GeneratedColumn<String> get victoryType => $composableBuilder(
+    column: $table.victoryType,
+    builder: (column) => column,
+  );
 
   Expression<T> gamePlayersRefs<T extends Object>(
     Expression<T> Function($$GamePlayersTableAnnotationComposer a) f,
@@ -1247,6 +1324,7 @@ class $$GamesTableTableManager
                 Value<String?> name = const Value.absent(),
                 Value<bool> finished = const Value.absent(),
                 Value<String?> winnerId = const Value.absent(),
+                Value<String?> victoryType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GamesCompanion(
                 id: id,
@@ -1255,6 +1333,7 @@ class $$GamesTableTableManager
                 name: name,
                 finished: finished,
                 winnerId: winnerId,
+                victoryType: victoryType,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -1265,6 +1344,7 @@ class $$GamesTableTableManager
                 Value<String?> name = const Value.absent(),
                 required bool finished,
                 Value<String?> winnerId = const Value.absent(),
+                Value<String?> victoryType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => GamesCompanion.insert(
                 id: id,
@@ -1273,6 +1353,7 @@ class $$GamesTableTableManager
                 name: name,
                 finished: finished,
                 winnerId: winnerId,
+                victoryType: victoryType,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

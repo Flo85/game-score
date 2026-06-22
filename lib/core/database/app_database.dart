@@ -10,6 +10,7 @@ class Games extends Table {
   TextColumn get name => text().nullable()(); // nom personnalisé pour les jeux génériques
   BoolColumn get finished => boolean()();
   TextColumn get winnerId => text().nullable()();
+  TextColumn get victoryType => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -39,14 +40,13 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.addColumn(games, games.winnerId);
-          }
+          if (from < 2) await m.addColumn(games, games.winnerId);
+          if (from < 3) await m.addColumn(games, games.victoryType);
         },
       );
 
@@ -104,7 +104,8 @@ class AppDatabase extends _$AppDatabase {
   Future<int> countPlayerWins(String playerId, String gameType) async {
     final query = customSelect(
       'SELECT COUNT(*) AS c FROM games '
-      'WHERE winner_id = ? AND finished = 1 AND game_type = ?',
+      "WHERE instr(',' || winner_id || ',', ',' || ? || ',') > 0 "
+      'AND finished = 1 AND game_type = ?',
       variables: [Variable.withString(playerId), Variable.withString(gameType)],
       readsFrom: {games},
     );

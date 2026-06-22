@@ -1,6 +1,8 @@
 import '../../../core/models/player.dart';
 export '../../../core/models/player.dart';
 
+enum VictoryType { highestScore, lowestScore }
+
 class GenericGame {
   final String id;
   final String name;
@@ -8,7 +10,8 @@ class GenericGame {
   final List<Player> players;
   final Map<String, List<int?>> scores; // playerId → score par manche
   final bool finished;
-  final String? winnerId;
+  final List<String> winnerIds;
+  final VictoryType victoryType;
 
   GenericGame({
     required this.id,
@@ -17,7 +20,8 @@ class GenericGame {
     required this.players,
     required this.scores,
     required this.finished,
-    this.winnerId,
+    this.winnerIds = const [],
+    this.victoryType = VictoryType.highestScore,
   });
 
   int get numberOfRounds => scores.values.isEmpty ? 0 : scores.values.first.length;
@@ -27,7 +31,8 @@ class GenericGame {
     List<Player>? players,
     Map<String, List<int?>>? scores,
     bool? finished,
-    String? winnerId,
+    List<String>? winnerIds,
+    VictoryType? victoryType,
   }) =>
       GenericGame(
         id: id,
@@ -36,7 +41,8 @@ class GenericGame {
         players: players ?? this.players,
         scores: scores ?? this.scores,
         finished: finished ?? this.finished,
-        winnerId: winnerId ?? this.winnerId,
+        winnerIds: winnerIds ?? this.winnerIds,
+        victoryType: victoryType ?? this.victoryType,
       );
 
   int? playerTotal(String playerId) {
@@ -53,18 +59,30 @@ class GenericGame {
         'players': players.map((p) => p.toJson()).toList(),
         'scores': scores.map((k, v) => MapEntry(k, v)),
         'finished': finished,
+        'victory_type': victoryType.name,
+        'winner_ids': winnerIds,
       };
 
-  factory GenericGame.fromJson(Map<String, dynamic> json) => GenericGame(
-        id: json['id'] as String,
-        name: json['name'] as String? ?? '',
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        players: (json['players'] as List)
-            .map((p) => Player.fromJson(p as Map<String, dynamic>))
-            .toList(),
-        scores: (json['scores'] as Map<String, dynamic>).map(
-          (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
-        ),
-        finished: json['finished'] as bool? ?? false,
-      );
+  factory GenericGame.fromJson(Map<String, dynamic> json) {
+    List<String> winnerIds = [];
+    if (json['winner_ids'] is List) {
+      winnerIds = (json['winner_ids'] as List).cast<String>();
+    } else if (json['winner_id'] is String) {
+      winnerIds = [json['winner_id'] as String];
+    }
+    return GenericGame(
+      id: json['id'] as String,
+      name: json['name'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      players: (json['players'] as List)
+          .map((p) => Player.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      scores: (json['scores'] as Map<String, dynamic>).map(
+        (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
+      ),
+      finished: json['finished'] as bool? ?? false,
+      victoryType: VictoryType.values.asNameMap()[json['victory_type'] as String? ?? ''] ?? VictoryType.highestScore,
+      winnerIds: winnerIds,
+    );
+  }
 }

@@ -18,7 +18,7 @@ class CurrentGenericGame extends _$CurrentGenericGame {
   @override
   GenericGame? build() => null;
 
-  Future<void> newGame(String name, List<Player> players) async {
+  Future<void> newGame(String name, List<Player> players, VictoryType victoryType) async {
     final savedRepo = ref.read(savedPlayersRepositoryProvider);
     final trimmed = players.map((p) => p.copyWith(name: p.name.trim())).toList();
 
@@ -44,6 +44,7 @@ class CurrentGenericGame extends _$CurrentGenericGame {
       players: resolved,
       scores: {for (final p in resolved) p.id: []},
       finished: false,
+      victoryType: victoryType,
     );
     await ref.read(genericRepositoryProvider).saveGame(game);
     state = game;
@@ -79,7 +80,7 @@ class CurrentGenericGame extends _$CurrentGenericGame {
     final repo = ref.read(genericRepositoryProvider);
     final finished = game.copyWith(
       finished: true,
-      winnerId: GenericRepository.computeWinner(game),
+      winnerIds: GenericRepository.computeWinner(game),
     );
     state = finished;
     await repo.saveGame(finished);
@@ -112,6 +113,14 @@ class GenericSetupName extends _$GenericSetupName {
   String build() => '';
 
   void set(String name) => state = name;
+}
+
+@riverpod
+class GenericSetupVictoryType extends _$GenericSetupVictoryType {
+  @override
+  VictoryType build() => VictoryType.highestScore;
+
+  void set(VictoryType type) => state = type;
 }
 
 @riverpod

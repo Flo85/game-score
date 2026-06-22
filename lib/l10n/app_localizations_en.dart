@@ -211,6 +211,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noFinishedGame => 'No finished games';
 
   @override
+  String get victoryType => 'Victory type';
+
+  @override
+  String get highestScore => 'Highest score';
+
+  @override
+  String get lowestScore => 'Lowest score';
+
+  @override
   String get language => 'Language';
 
   @override

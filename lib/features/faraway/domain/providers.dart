@@ -123,7 +123,7 @@ class CurrentGame extends _$CurrentGame {
     final repo = ref.read(farawayRepositoryProvider);
     final finished = game.copyWith(
       finished: true,
-      winnerId: FarawayRepository.computeWinner(game),
+      winnerIds: FarawayRepository.computeWinner(game),
     );
     state = finished;
     await repo.saveGame(finished);

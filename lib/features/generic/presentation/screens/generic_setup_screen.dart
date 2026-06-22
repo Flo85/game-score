@@ -17,6 +17,7 @@ class GenericSetupScreen extends ConsumerWidget {
     final notifier = ref.read(genericSetupPlayersProvider.notifier);
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
     final gameName = ref.watch(genericSetupNameProvider);
+    final victoryType = ref.watch(genericSetupVictoryTypeProvider);
     final canStart = players.isNotEmpty &&
         gameName.trim().isNotEmpty &&
         players.every((p) => p.name.trim().isNotEmpty);
@@ -45,7 +46,7 @@ class GenericSetupScreen extends ConsumerWidget {
                 ? () async {
                     await ref
                         .read(currentGenericGameProvider.notifier)
-                        .newGame(gameName.trim(), players);
+                        .newGame(gameName.trim(), players, victoryType);
                     if (context.mounted) {
                       Navigator.push(
                         context,
@@ -79,6 +80,17 @@ class GenericSetupScreen extends ConsumerWidget {
               ),
               textCapitalization: TextCapitalization.words,
               onChanged: (v) => ref.read(genericSetupNameProvider.notifier).set(v),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SegmentedButton<VictoryType>(
+              segments: [
+                ButtonSegment(value: VictoryType.highestScore, label: Text(l.highestScore)),
+                ButtonSegment(value: VictoryType.lowestScore, label: Text(l.lowestScore)),
+              ],
+              selected: {victoryType},
+              onSelectionChanged: (s) => ref.read(genericSetupVictoryTypeProvider.notifier).set(s.first),
             ),
           ),
           Expanded(

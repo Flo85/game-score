@@ -10,7 +10,7 @@ class FarawayGame {
   final List<Player> players;
   final Map<String, List<int?>> scores;
   final bool finished;
-  final String? winnerId;
+  final List<String> winnerIds;
 
   FarawayGame({
     required this.id,
@@ -19,14 +19,14 @@ class FarawayGame {
     required this.players,
     required this.scores,
     required this.finished,
-    this.winnerId,
+    this.winnerIds = const [],
   });
 
   FarawayGame copyWith({
     List<Player>? players,
     Map<String, List<int?>>? scores,
     bool? finished,
-    String? winnerId,
+    List<String>? winnerIds,
   }) =>
       FarawayGame(
         id: id,
@@ -35,7 +35,7 @@ class FarawayGame {
         players: players ?? this.players,
         scores: scores ?? this.scores,
         finished: finished ?? this.finished,
-        winnerId: winnerId ?? this.winnerId,
+        winnerIds: winnerIds ?? this.winnerIds,
       );
 
   int? playerTotal(String playerId) {
@@ -51,19 +51,29 @@ class FarawayGame {
         'players': players.map((p) => p.toJson()).toList(),
         'scores': scores.map((k, v) => MapEntry(k, v)),
         'finished': finished,
+        'winner_ids': winnerIds,
       };
 
-  factory FarawayGame.fromJson(Map<String, dynamic> json) => FarawayGame(
-        id: json['id'] as String,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        gameType: json['gameType'] as String? ?? 'faraway',
-        players: (json['players'] as List)
-            .map((p) => Player.fromJson(p as Map<String, dynamic>))
-            .toList(),
-        scores: (json['scores'] as Map<String, dynamic>).map(
-          (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
-        ),
-        finished: json['finished'] as bool? ?? !(json['writable'] as bool? ?? true),
-        winnerId: json['winner_id'] as String?,
-      );
+  factory FarawayGame.fromJson(Map<String, dynamic> json) {
+    // Compatibilité avec l'ancien format (winner_id: String unique)
+    List<String> winnerIds = [];
+    if (json['winner_ids'] is List) {
+      winnerIds = (json['winner_ids'] as List).cast<String>();
+    } else if (json['winner_id'] is String) {
+      winnerIds = [json['winner_id'] as String];
+    }
+    return FarawayGame(
+      id: json['id'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      gameType: json['gameType'] as String? ?? 'faraway',
+      players: (json['players'] as List)
+          .map((p) => Player.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      scores: (json['scores'] as Map<String, dynamic>).map(
+        (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
+      ),
+      finished: json['finished'] as bool? ?? !(json['writable'] as bool? ?? true),
+      winnerIds: winnerIds,
+    );
+  }
 }

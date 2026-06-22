@@ -108,6 +108,10 @@
   "worstScore": "Pire score",
   "noFinishedGame": "Aucune partie terminée",
 
+  "victoryType": "Type de victoire",
+  "highestScore": "Score le plus élevé",
+  "lowestScore": "Score le plus bas",
+
   "language": "Langue",
   "systemLanguage": "Système",
 

@@ -108,6 +108,10 @@
   "worstScore": "Worst score",
   "noFinishedGame": "No finished games",
 
+  "victoryType": "Victory type",
+  "highestScore": "Highest score",
+  "lowestScore": "Lowest score",
+
   "language": "Language",
   "systemLanguage": "System",
 

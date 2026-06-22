@@ -35,7 +35,7 @@ class FarawayRepository {
       createdAt: Value(game.createdAt),
       gameType: Value(game.gameType),
       finished: Value(game.finished),
-      winnerId: Value(game.winnerId),
+      winnerId: Value(game.winnerIds.isEmpty ? null : game.winnerIds.join(',')),
     ));
 
     await _db.replaceGamePlayers(
@@ -121,10 +121,10 @@ class FarawayRepository {
       });
 
       final resolved = game.copyWith(players: resolvedPlayers, scores: remappedScores);
-      final winnerId = resolved.winnerId != null
-          ? idRemap[resolved.winnerId] ?? resolved.winnerId
+      final winnerIds = resolved.winnerIds.isNotEmpty
+          ? resolved.winnerIds.map((id) => idRemap[id] ?? id).toList()
           : FarawayRepository.computeWinner(resolved);
-      await saveGame(resolved.copyWith(winnerId: winnerId));
+      await saveGame(resolved.copyWith(winnerIds: winnerIds));
       imported++;
     }
 
@@ -174,18 +174,24 @@ class FarawayRepository {
       players: players,
       scores: scores,
       finished: row.finished,
-      winnerId: row.winnerId,
+      winnerIds: row.winnerId?.split(',').where((s) => s.isNotEmpty).toList() ?? [],
     );
   }
 
-  static String? computeWinner(FarawayGame game) {
-    if (game.players.isEmpty) return null;
-    String? winner;
-    int best = -1;
+  static List<String> computeWinner(FarawayGame game) {
+    if (game.players.isEmpty) return [];
+    int? best;
     for (final p in game.players) {
       final total = (game.scores[p.id] ?? []).whereType<int>().fold(0, (a, b) => a + b);
-      if (total > best) { best = total; winner = p.id; }
+      if (best == null || total > best) best = total;
     }
-    return winner;
+    if (best == null) return [];
+    return game.players
+        .where((p) {
+          final total = (game.scores[p.id] ?? []).whereType<int>().fold(0, (a, b) => a + b);
+          return total == best;
+        })
+        .map((p) => p.id)
+        .toList();
   }
 }
