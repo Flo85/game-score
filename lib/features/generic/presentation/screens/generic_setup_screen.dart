@@ -18,7 +18,7 @@ class GenericSetupScreen extends ConsumerWidget {
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
     final gameName = ref.watch(genericSetupNameProvider);
     final victoryType = ref.watch(genericSetupVictoryTypeProvider);
-    final canStart = players.isNotEmpty &&
+    final canStart = players.length >= 2 &&
         gameName.trim().isNotEmpty &&
         players.every((p) => p.name.trim().isNotEmpty);
 
@@ -81,6 +81,10 @@ class GenericSetupScreen extends ConsumerWidget {
               textCapitalization: TextCapitalization.words,
               onChanged: (v) => ref.read(genericSetupNameProvider.notifier).set(v),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: Text(l.victoryType, style: const TextStyle(color: Colors.grey, fontSize: 13)),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),

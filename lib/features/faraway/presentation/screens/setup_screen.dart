@@ -38,7 +38,7 @@ class SetupScreen extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: players.isEmpty || players.any((p) => p.name.trim().isEmpty)
+            onPressed: players.length < 2 || players.any((p) => p.name.trim().isEmpty)
                 ? null
                 : () async {
                     await ref.read(currentGameProvider.notifier).newGame(players);
