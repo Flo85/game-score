@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @roundAbbrev.
   ///
   /// In en, this message translates to:
-  /// **'Rnd'**
+  /// **'Round'**
   String get roundAbbrev;
 
   /// No description provided for @totalLabel.

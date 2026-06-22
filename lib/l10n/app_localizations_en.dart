@@ -113,7 +113,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalAbbrev => 'T';
 
   @override
-  String get roundAbbrev => 'Rnd';
+  String get roundAbbrev => 'Round';
 
   @override
   String get totalLabel => 'Total';

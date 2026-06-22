@@ -57,7 +57,7 @@
   "scoreSheet": "Feuille de score",
   "gameEnded": "Partie terminée",
   "totalAbbrev": "T",
-  "roundAbbrev": "M.",
+  "roundAbbrev": "Manche",
   "totalLabel": "Total",
   "roundLabel": "Manche",
   "endGameQuestion": "Terminer la partie ?",
