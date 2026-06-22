@@ -133,6 +133,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               _PlayerHeaderRow(
                                 players: players,
                                 colPlayerWidth: colPlayerWidth,
+                                winnerIds: game.winnerIds,
                               ),
                               Expanded(
                                 child: SingleChildScrollView(
@@ -252,10 +253,12 @@ class _FixedCell extends StatelessWidget {
 class _PlayerHeaderRow extends StatelessWidget {
   final List<Player> players;
   final double colPlayerWidth;
+  final List<String> winnerIds;
 
   const _PlayerHeaderRow({
     required this.players,
     required this.colPlayerWidth,
+    this.winnerIds = const [],
   });
 
   @override
@@ -273,10 +276,17 @@ class _PlayerHeaderRow extends StatelessWidget {
               borderBottom: true,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                child: Text(
-                  p.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (winnerIds.contains(p.id))
+                      const Icon(Icons.emoji_events, size: 16, color: Color(0xFFB8860B)),
+                    Text(
+                      p.name,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    ),
+                  ],
                 ),
               ),
             ),

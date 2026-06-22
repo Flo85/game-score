@@ -123,6 +123,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                                           label: p.name,
                                           width: colPlayerWidth,
                                           height: _rowHeight,
+                                          isWinner: game.winnerIds.contains(p.id),
                                         ))
                                     .toList(),
                               ),
@@ -232,8 +233,14 @@ class _HeaderCell extends StatelessWidget {
   final String label;
   final double width;
   final double height;
+  final bool isWinner;
 
-  const _HeaderCell({required this.label, required this.width, required this.height});
+  const _HeaderCell({
+    required this.label,
+    required this.width,
+    required this.height,
+    this.isWinner = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -246,12 +253,19 @@ class _HeaderCell extends StatelessWidget {
         border: Border.all(color: _colorBorder, width: 0.5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isWinner)
+            const Icon(Icons.emoji_events, size: 16, color: Color(0xFFB8860B)),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ],
       ),
     );
   }
