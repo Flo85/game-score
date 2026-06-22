@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../presentation/screens/player_stats_screen.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
 
@@ -26,6 +27,7 @@ class SavedPlayersScreen extends ConsumerWidget {
               final player = players[i];
               return ListTile(
                 title: Text(player.name),
+                subtitle: _PlayerStatsSummary(playerId: player.id),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -38,6 +40,10 @@ class SavedPlayersScreen extends ConsumerWidget {
                       onPressed: () => _showDeleteDialog(context, player, repo.delete),
                     ),
                   ],
+                ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PlayerStatsScreen(player: player)),
                 ),
               );
             },
@@ -158,6 +164,26 @@ class _NameDialogState extends State<_NameDialog> {
           child: Text(widget.confirmLabel),
         ),
       ],
+    );
+  }
+}
+
+// ── Résumé stats dans le carnet ───────────────────────────────────────────────
+
+class _PlayerStatsSummary extends ConsumerWidget {
+  final String playerId;
+  const _PlayerStatsSummary({required this.playerId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summaryAsync = ref.watch(playerCarnetSummaryProvider(playerId));
+    return summaryAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (s) {
+        if (s.games == 0) return const SizedBox.shrink();
+        return Text('${s.games} partie${s.games > 1 ? 's' : ''} · ${s.wins} victoire${s.wins > 1 ? 's' : ''}');
+      },
     );
   }
 }

@@ -1,10 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/models/player_stats.dart';
 import '../../../features/faraway/domain/providers.dart' show appDatabaseProvider, savedPlayersRepositoryProvider;
 import '../data/generic_repository.dart';
 import 'models.dart';
 
-export '../../../features/faraway/domain/providers.dart' show savedPlayersListProvider, savedPlayersRepositoryProvider;
+export '../../../features/faraway/domain/providers.dart' show savedPlayersListProvider, savedPlayersRepositoryProvider, farawayPlayerStatsProvider;
 
 part 'providers.g.dart';
 
@@ -75,8 +76,13 @@ class CurrentGenericGame extends _$CurrentGenericGame {
   Future<void> endGame() async {
     final game = state;
     if (game == null) return;
-    state = game.copyWith(finished: true);
-    await ref.read(genericRepositoryProvider).saveGame(state!);
+    final repo = ref.read(genericRepositoryProvider);
+    final finished = game.copyWith(
+      finished: true,
+      winnerId: GenericRepository.computeWinner(game),
+    );
+    state = finished;
+    await repo.saveGame(finished);
   }
 
   void reset() => state = null;
@@ -91,6 +97,14 @@ class CurrentGenericGame extends _$CurrentGenericGame {
 @riverpod
 Stream<List<GenericGame>> genericGameHistory(Ref ref) =>
     ref.watch(genericRepositoryProvider).watchHistory();
+
+@riverpod
+Future<GenericPlayerStats> genericPlayerStats(Ref ref, String playerId) async {
+  final db = ref.watch(appDatabaseProvider);
+  final games = await db.countPlayerGames(playerId, 'generic');
+  final wins = await db.countPlayerWins(playerId, 'generic');
+  return GenericPlayerStats(gamesPlayed: games, wins: wins);
+}
 
 @riverpod
 class GenericSetupName extends _$GenericSetupName {

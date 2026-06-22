@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/models/player_stats.dart';
 import '../data/faraway_repository.dart';
 import '../data/saved_players_repository.dart';
 import 'models.dart';
@@ -31,6 +32,22 @@ Stream<List<Player>> savedPlayersList(Ref ref) =>
 @riverpod
 Stream<List<FarawayGame>> gameHistory(Ref ref) =>
     ref.watch(farawayRepositoryProvider).watchHistory();
+
+// ── Stats joueur ───────────────────────────────────────────────────────────────
+
+@riverpod
+Future<FarawayPlayerStats> farawayPlayerStats(Ref ref, String playerId) =>
+    ref.watch(farawayRepositoryProvider).getPlayerStats(playerId);
+
+@riverpod
+Future<({int games, int wins})> playerCarnetSummary(Ref ref, String playerId) async {
+  final db = ref.watch(appDatabaseProvider);
+  final farawayGames = await db.countPlayerGames(playerId, 'faraway');
+  final genericGames = await db.countPlayerGames(playerId, 'generic');
+  final farawayWins = await db.countPlayerWins(playerId, 'faraway');
+  final genericWins = await db.countPlayerWins(playerId, 'generic');
+  return (games: farawayGames + genericGames, wins: farawayWins + genericWins);
+}
 
 // ── Partie en cours ────────────────────────────────────────────────────────────
 
@@ -103,8 +120,13 @@ class CurrentGame extends _$CurrentGame {
   Future<void> endGame() async {
     final game = state;
     if (game == null) return;
-    state = game.copyWith(finished: true);
-    await ref.read(farawayRepositoryProvider).saveGame(state!);
+    final repo = ref.read(farawayRepositoryProvider);
+    final finished = game.copyWith(
+      finished: true,
+      winnerId: FarawayRepository.computeWinner(game),
+    );
+    state = finished;
+    await repo.saveGame(finished);
   }
 
   void reset() => state = null;

@@ -8,6 +8,7 @@ class GenericGame {
   final List<Player> players;
   final Map<String, List<int?>> scores; // playerId → score par manche
   final bool finished;
+  final String? winnerId;
 
   GenericGame({
     required this.id,
@@ -16,6 +17,7 @@ class GenericGame {
     required this.players,
     required this.scores,
     required this.finished,
+    this.winnerId,
   });
 
   int get numberOfRounds => scores.values.isEmpty ? 0 : scores.values.first.length;
@@ -25,6 +27,7 @@ class GenericGame {
     List<Player>? players,
     Map<String, List<int?>>? scores,
     bool? finished,
+    String? winnerId,
   }) =>
       GenericGame(
         id: id,
@@ -33,6 +36,7 @@ class GenericGame {
         players: players ?? this.players,
         scores: scores ?? this.scores,
         finished: finished ?? this.finished,
+        winnerId: winnerId ?? this.winnerId,
       );
 
   int? playerTotal(String playerId) {

@@ -32,6 +32,7 @@ class GenericRepository {
       gameType: const Value('generic'),
       name: Value(game.name),
       finished: Value(game.finished),
+      winnerId: Value(game.winnerId),
     ));
 
     await _db.replaceGamePlayers(
@@ -65,6 +66,18 @@ class GenericRepository {
       players: players,
       scores: scores,
       finished: row.finished,
+      winnerId: row.winnerId,
     );
+  }
+
+  static String? computeWinner(GenericGame game) {
+    if (game.players.isEmpty) return null;
+    String? winner;
+    int best = -1;
+    for (final p in game.players) {
+      final total = (game.scores[p.id] ?? []).whereType<int>().fold(0, (a, b) => a + b);
+      if (total > best) { best = total; winner = p.id; }
+    }
+    return winner;
   }
 }

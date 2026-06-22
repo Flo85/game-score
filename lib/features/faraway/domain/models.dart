@@ -10,6 +10,7 @@ class FarawayGame {
   final List<Player> players;
   final Map<String, List<int?>> scores;
   final bool finished;
+  final String? winnerId;
 
   FarawayGame({
     required this.id,
@@ -18,12 +19,14 @@ class FarawayGame {
     required this.players,
     required this.scores,
     required this.finished,
+    this.winnerId,
   });
 
   FarawayGame copyWith({
     List<Player>? players,
     Map<String, List<int?>>? scores,
     bool? finished,
+    String? winnerId,
   }) =>
       FarawayGame(
         id: id,
@@ -32,6 +35,7 @@ class FarawayGame {
         players: players ?? this.players,
         scores: scores ?? this.scores,
         finished: finished ?? this.finished,
+        winnerId: winnerId ?? this.winnerId,
       );
 
   int? playerTotal(String playerId) {
@@ -60,5 +64,6 @@ class FarawayGame {
           (k, v) => MapEntry(k, (v as List).map((e) => e as int?).toList()),
         ),
         finished: json['finished'] as bool? ?? !(json['writable'] as bool? ?? true),
+        winnerId: json['winner_id'] as String?,
       );
 }

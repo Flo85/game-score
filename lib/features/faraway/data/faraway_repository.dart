@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/models/player_stats.dart';
 import '../domain/models.dart';
 
 class FarawayRepository {
@@ -34,6 +35,7 @@ class FarawayRepository {
       createdAt: Value(game.createdAt),
       gameType: Value(game.gameType),
       finished: Value(game.finished),
+      winnerId: Value(game.winnerId),
     ));
 
     await _db.replaceGamePlayers(
@@ -118,11 +120,45 @@ class FarawayRepository {
         remappedScores[idRemap[oldId] ?? oldId] = scores;
       });
 
-      await saveGame(game.copyWith(players: resolvedPlayers, scores: remappedScores));
+      final resolved = game.copyWith(players: resolvedPlayers, scores: remappedScores);
+      final winnerId = resolved.winnerId != null
+          ? idRemap[resolved.winnerId] ?? resolved.winnerId
+          : FarawayRepository.computeWinner(resolved);
+      await saveGame(resolved.copyWith(winnerId: winnerId));
       imported++;
     }
 
     return imported;
+  }
+
+  Future<FarawayPlayerStats> getPlayerStats(String playerId) async {
+    final finished = (await watchHistory().first)
+        .where((g) => g.finished && g.scores.containsKey(playerId))
+        .toList();
+    if (finished.isEmpty) {
+      return const FarawayPlayerStats(gamesPlayed: 0, wins: 0, averageScore: 0, bestScore: 0, worstScore: 0);
+    }
+
+    int totalScore = 0;
+    int best = -1;
+    int worst = -1;
+
+    for (final game in finished) {
+      final score = (game.scores[playerId] ?? []).whereType<int>().fold(0, (a, b) => a + b);
+      totalScore += score;
+      if (best == -1 || score > best) best = score;
+      if (worst == -1 || score < worst) worst = score;
+    }
+
+    final wins = await _db.countPlayerWins(playerId, 'faraway');
+
+    return FarawayPlayerStats(
+      gamesPlayed: finished.length,
+      wins: wins,
+      averageScore: totalScore / finished.length,
+      bestScore: best,
+      worstScore: worst,
+    );
   }
 
   FarawayGame _rowToGame(Game row, List<GamePlayer> gp) {
@@ -138,6 +174,18 @@ class FarawayRepository {
       players: players,
       scores: scores,
       finished: row.finished,
+      winnerId: row.winnerId,
     );
+  }
+
+  static String? computeWinner(FarawayGame game) {
+    if (game.players.isEmpty) return null;
+    String? winner;
+    int best = -1;
+    for (final p in game.players) {
+      final total = (game.scores[p.id] ?? []).whereType<int>().fold(0, (a, b) => a + b);
+      if (total > best) { best = total; winner = p.id; }
+    }
+    return winner;
   }
 }

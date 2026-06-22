@@ -225,6 +225,162 @@ final class GameHistoryProvider
 
 String _$gameHistoryHash() => r'c6ac9f8cedddac5761f6079017eb50de7935b8ce';
 
+@ProviderFor(farawayPlayerStats)
+final farawayPlayerStatsProvider = FarawayPlayerStatsFamily._();
+
+final class FarawayPlayerStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<FarawayPlayerStats>,
+          FarawayPlayerStats,
+          FutureOr<FarawayPlayerStats>
+        >
+    with
+        $FutureModifier<FarawayPlayerStats>,
+        $FutureProvider<FarawayPlayerStats> {
+  FarawayPlayerStatsProvider._({
+    required FarawayPlayerStatsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'farawayPlayerStatsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$farawayPlayerStatsHash();
+
+  @override
+  String toString() {
+    return r'farawayPlayerStatsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<FarawayPlayerStats> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<FarawayPlayerStats> create(Ref ref) {
+    final argument = this.argument as String;
+    return farawayPlayerStats(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FarawayPlayerStatsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$farawayPlayerStatsHash() =>
+    r'2c7f5885c9c81d6d0e3584349e89b737c947780b';
+
+final class FarawayPlayerStatsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<FarawayPlayerStats>, String> {
+  FarawayPlayerStatsFamily._()
+    : super(
+        retry: null,
+        name: r'farawayPlayerStatsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  FarawayPlayerStatsProvider call(String playerId) =>
+      FarawayPlayerStatsProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'farawayPlayerStatsProvider';
+}
+
+@ProviderFor(playerCarnetSummary)
+final playerCarnetSummaryProvider = PlayerCarnetSummaryFamily._();
+
+final class PlayerCarnetSummaryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<({int games, int wins})>,
+          ({int games, int wins}),
+          FutureOr<({int games, int wins})>
+        >
+    with
+        $FutureModifier<({int games, int wins})>,
+        $FutureProvider<({int games, int wins})> {
+  PlayerCarnetSummaryProvider._({
+    required PlayerCarnetSummaryFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'playerCarnetSummaryProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$playerCarnetSummaryHash();
+
+  @override
+  String toString() {
+    return r'playerCarnetSummaryProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<({int games, int wins})> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<({int games, int wins})> create(Ref ref) {
+    final argument = this.argument as String;
+    return playerCarnetSummary(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PlayerCarnetSummaryProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$playerCarnetSummaryHash() =>
+    r'07c598dee10cd08e01c676b4078d16ce5596d8ce';
+
+final class PlayerCarnetSummaryFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<({int games, int wins})>, String> {
+  PlayerCarnetSummaryFamily._()
+    : super(
+        retry: null,
+        name: r'playerCarnetSummaryProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  PlayerCarnetSummaryProvider call(String playerId) =>
+      PlayerCarnetSummaryProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'playerCarnetSummaryProvider';
+}
+
 @ProviderFor(CurrentGame)
 final currentGameProvider = CurrentGameProvider._();
 
@@ -257,7 +413,7 @@ final class CurrentGameProvider
   }
 }
 
-String _$currentGameHash() => r'5855a62d2f53525ccb6468b79cb08e47b370dcaa';
+String _$currentGameHash() => r'6ccc272d9de9307def5bba55bd99f04dd1872060';
 
 abstract class _$CurrentGame extends $Notifier<FarawayGame?> {
   FarawayGame? build();
@@ -309,7 +465,7 @@ final class SetupPlayersProvider
   }
 }
 
-String _$setupPlayersHash() => r'befb8e8654b7a8282681f7faf68e38bbd6ffb857';
+String _$setupPlayersHash() => r'0625570ca91ae07e6ed0ba4af36443bf48b379ce';
 
 abstract class _$SetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();

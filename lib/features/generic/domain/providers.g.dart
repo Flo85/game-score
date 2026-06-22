@@ -89,7 +89,7 @@ final class CurrentGenericGameProvider
 }
 
 String _$currentGenericGameHash() =>
-    r'1162196054795ed26666eb2b935f22f9586bb779';
+    r'e37c1a7f8683bd4ffe4f50ed69419e8953749c63';
 
 abstract class _$CurrentGenericGame extends $Notifier<GenericGame?> {
   GenericGame? build();
@@ -150,6 +150,84 @@ final class GenericGameHistoryProvider
 
 String _$genericGameHistoryHash() =>
     r'0b8a367cb37503e779afb005f08c7425d6992089';
+
+@ProviderFor(genericPlayerStats)
+final genericPlayerStatsProvider = GenericPlayerStatsFamily._();
+
+final class GenericPlayerStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<GenericPlayerStats>,
+          GenericPlayerStats,
+          FutureOr<GenericPlayerStats>
+        >
+    with
+        $FutureModifier<GenericPlayerStats>,
+        $FutureProvider<GenericPlayerStats> {
+  GenericPlayerStatsProvider._({
+    required GenericPlayerStatsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'genericPlayerStatsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$genericPlayerStatsHash();
+
+  @override
+  String toString() {
+    return r'genericPlayerStatsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<GenericPlayerStats> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<GenericPlayerStats> create(Ref ref) {
+    final argument = this.argument as String;
+    return genericPlayerStats(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GenericPlayerStatsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$genericPlayerStatsHash() =>
+    r'a7f22fae4bd5eeebe4f55c53c75d4402b38c316e';
+
+final class GenericPlayerStatsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<GenericPlayerStats>, String> {
+  GenericPlayerStatsFamily._()
+    : super(
+        retry: null,
+        name: r'genericPlayerStatsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  GenericPlayerStatsProvider call(String playerId) =>
+      GenericPlayerStatsProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'genericPlayerStatsProvider';
+}
 
 @ProviderFor(GenericSetupName)
 final genericSetupNameProvider = GenericSetupNameProvider._();
@@ -236,7 +314,7 @@ final class GenericSetupPlayersProvider
 }
 
 String _$genericSetupPlayersHash() =>
-    r'8fa174e76244f0485eca2178084621aed69b12c5';
+    r'4568b26cd2945aa4a2b0f4853650745a22eb82f3';
 
 abstract class _$GenericSetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();

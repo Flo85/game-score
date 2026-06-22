@@ -9,6 +9,7 @@ class Games extends Table {
   TextColumn get gameType => text().withDefault(const Constant('faraway'))();
   TextColumn get name => text().nullable()(); // nom personnalisé pour les jeux génériques
   BoolColumn get finished => boolean()();
+  TextColumn get winnerId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -38,7 +39,16 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(games, games.winnerId);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'faraway_game');
@@ -76,6 +86,31 @@ class AppDatabase extends _$AppDatabase {
             ..where((gp) => gp.gameId.equals(gameId))
             ..orderBy([(gp) => OrderingTerm.asc(gp.position)]))
           .get();
+
+  // ── Stats joueur (optimisées SQL) ────────────────────────────────────────────
+
+  Future<int> countPlayerGames(String playerId, String gameType) async {
+    final query = customSelect(
+      'SELECT COUNT(*) AS c FROM game_players gp '
+      'JOIN games g ON g.id = gp.game_id '
+      'WHERE gp.player_id = ? AND g.finished = 1 AND g.game_type = ?',
+      variables: [Variable.withString(playerId), Variable.withString(gameType)],
+      readsFrom: {gamePlayers, games},
+    );
+    final row = await query.getSingle();
+    return row.read<int>('c');
+  }
+
+  Future<int> countPlayerWins(String playerId, String gameType) async {
+    final query = customSelect(
+      'SELECT COUNT(*) AS c FROM games '
+      'WHERE winner_id = ? AND finished = 1 AND game_type = ?',
+      variables: [Variable.withString(playerId), Variable.withString(gameType)],
+      readsFrom: {games},
+    );
+    final row = await query.getSingle();
+    return row.read<int>('c');
+  }
 
   // ── SavedPlayers ──────────────────────────────────────────────────────────────
 
