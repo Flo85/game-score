@@ -13,6 +13,7 @@ const _colorBorder = Color(0xFFBBBBBB);
 const _colorSanctuary = Color(0xFFEEE8DC);
 const _colorTotal = Color(0xFFD0360A);
 const _colorHeader = Color(0xFFF0EBE0);
+const _colorWinner = Color(0xFFFFF8DC);
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -274,13 +275,16 @@ class _PlayerHeaderRow extends StatelessWidget {
               width: colPlayerWidth,
               borderRight: p != players.last,
               borderBottom: true,
+              color: winnerIds.contains(p.id) ? _colorWinner : _colorHeader,
+              accentBorderColor: winnerIds.contains(p.id) ? const Color(0xFFDAA520) : null,
+              accentTop: true,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (winnerIds.contains(p.id))
-                      const Icon(Icons.emoji_events, size: 16, color: Color(0xFFB8860B)),
+                      const Icon(Icons.emoji_events, size: 16, color: Color(0xFFDAA520)),
                     Text(
                       p.name,
                       textAlign: TextAlign.center,
@@ -320,21 +324,24 @@ class _ScoreRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isSanctuary ? _colorSanctuary : _colorBackground;
+    final rowBg = isSanctuary ? _colorSanctuary : _colorBackground;
     return Container(
       height: _rowHeight,
       decoration: BoxDecoration(
-        color: bg,
+        color: rowBg,
         border: Border(
           top: BorderSide(color: _colorBorder, width: isSanctuary ? 1 : 0.5),
         ),
       ),
       child: Row(
-        children: players.map(
-          (p) => _Cell(
+        children: players.map((p) {
+          final isWinner = game.winnerIds.contains(p.id);
+          final bg = isWinner ? _colorWinner : rowBg;
+          return _Cell(
             width: colPlayerWidth,
             borderRight: p != players.last,
             color: bg,
+            accentBorderColor: isWinner ? const Color(0xFFDAA520) : null,
             child: _ScoreInput(
               key: ValueKey('${p.id}-$row'),
               playerId: p.id,
@@ -343,8 +350,8 @@ class _ScoreRow extends StatelessWidget {
               writable: writable,
               notifier: notifier,
             ),
-          ),
-        ).toList(),
+          );
+        }).toList(),
       ),
     );
   }
@@ -365,17 +372,25 @@ class _TotalRow extends StatelessWidget {
       color: _colorTotal,
       height: _rowHeight,
       child: Row(
-        children: players.map(
-          (p) => _Cell(
+        children: players.map((p) {
+          final isWinner = game.winnerIds.contains(p.id);
+          return _Cell(
             width: colPlayerWidth,
             borderRight: p != players.last,
             borderColor: Colors.white38,
+            color: isWinner ? const Color(0xFFDAA520) : null,
+            accentBorderColor: isWinner ? const Color(0xFFDAA520) : null,
+            accentBottom: true,
             child: Text(
               game.playerTotal(p.id)?.toString() ?? '',
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white),
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: isWinner ? Colors.white : Colors.white,
+              ),
             ),
-          ),
-        ).toList(),
+          );
+        }).toList(),
       ),
     );
   }
@@ -454,6 +469,9 @@ class _Cell extends StatelessWidget {
   final bool borderBottom;
   final Color? color;
   final Color borderColor;
+  final Color? accentBorderColor;
+  final bool accentTop;
+  final bool accentBottom;
 
   const _Cell({
     required this.width,
@@ -462,18 +480,32 @@ class _Cell extends StatelessWidget {
     this.borderBottom = false,
     this.color,
     this.borderColor = _colorBorder,
+    this.accentBorderColor,
+    this.accentTop = false,
+    this.accentBottom = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final accent = accentBorderColor;
     return Container(
       width: width,
       height: _rowHeight,
       decoration: BoxDecoration(
         color: color,
         border: Border(
-          right: borderRight ? BorderSide(color: borderColor, width: 0.5) : BorderSide.none,
-          bottom: borderBottom ? BorderSide(color: borderColor, width: 0.5) : BorderSide.none,
+          top: (accent != null && accentTop) ? BorderSide(color: accent, width: 2) : BorderSide.none,
+          left: accent != null ? BorderSide(color: accent, width: 2) : BorderSide.none,
+          right: accent != null
+              ? BorderSide(color: accent, width: 2)
+              : borderRight
+                  ? BorderSide(color: borderColor, width: 0.5)
+                  : BorderSide.none,
+          bottom: (accent != null && accentBottom)
+              ? BorderSide(color: accent, width: 2)
+              : borderBottom
+                  ? BorderSide(color: borderColor, width: 0.5)
+                  : BorderSide.none,
         ),
       ),
       alignment: Alignment.center,

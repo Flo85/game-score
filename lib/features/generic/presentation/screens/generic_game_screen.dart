@@ -10,6 +10,7 @@ const _rowHeight = 56.0;
 const _colorBackground = Color(0xFFFAF8F5);
 const _colorBorder = Color(0xFFBBBBBB);
 const _colorTotal = Color(0xFFD0360A);
+const _colorWinner = Color(0xFFFFF8DC);
 const _colorHeader = Color(0xFFF0EBE0);
 
 class GenericGameScreen extends ConsumerStatefulWidget {
@@ -136,11 +137,13 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                                     if (i < rounds) {
                                       return Row(
                                         children: players.map((p) {
+                                          final isWinner = game.winnerIds.contains(p.id);
                                           return _ScoreInput(
                                             key: ValueKey('${p.id}-$i'),
                                             value: game.scores[p.id]?[i],
                                             width: colPlayerWidth,
                                             enabled: writable,
+                                            bgColor: isWinner ? _colorWinner : _colorBackground,
                                             onChanged: (v) => notifier.setScore(p.id, i, v),
                                           );
                                         }).toList(),
@@ -150,11 +153,14 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                                     return Row(
                                       children: players.map((p) {
                                         final total = game.playerTotal(p.id);
+                                        final isWinner = game.winnerIds.contains(p.id);
                                         return _Cell(
                                           label: total?.toString() ?? '—',
                                           width: colPlayerWidth,
-                                          textColor: _colorTotal,
+                                          textColor: isWinner ? const Color(0xFFDAA520) : _colorTotal,
                                           bold: true,
+                                          bgColor: isWinner ? _colorWinner : null,
+                                          accentBorder: isWinner,
                                         );
                                       }).toList(),
                                     );
@@ -249,15 +255,22 @@ class _HeaderCell extends StatelessWidget {
       height: height,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _colorHeader,
-        border: Border.all(color: _colorBorder, width: 0.5),
+        color: isWinner ? _colorWinner : _colorHeader,
+        border: isWinner
+            ? const Border(
+                top: BorderSide(color: Color(0xFFDAA520), width: 2),
+                left: BorderSide(color: Color(0xFFDAA520), width: 2),
+                right: BorderSide(color: Color(0xFFDAA520), width: 2),
+                bottom: BorderSide(color: _colorBorder, width: 0.5),
+              )
+            : Border.all(color: _colorBorder, width: 0.5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (isWinner)
-            const Icon(Icons.emoji_events, size: 16, color: Color(0xFFB8860B)),
+            const Icon(Icons.emoji_events, size: 16, color: Color(0xFFDAA520)),
           Text(
             label,
             textAlign: TextAlign.center,
@@ -275,13 +288,17 @@ class _Cell extends StatelessWidget {
   final String label;
   final double width;
   final Color? textColor;
+  final Color? bgColor;
   final bool bold;
+  final bool accentBorder;
 
   const _Cell({
     required this.label,
     required this.width,
     this.textColor,
+    this.bgColor,
     this.bold = false,
+    this.accentBorder = false,
   });
 
   @override
@@ -291,7 +308,15 @@ class _Cell extends StatelessWidget {
       height: _rowHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        border: Border.all(color: _colorBorder, width: 0.5),
+        color: bgColor,
+        border: accentBorder
+            ? const Border(
+                left: BorderSide(color: Color(0xFFDAA520), width: 2),
+                right: BorderSide(color: Color(0xFFDAA520), width: 2),
+                bottom: BorderSide(color: Color(0xFFDAA520), width: 2),
+                top: BorderSide(color: _colorBorder, width: 0.5),
+              )
+            : Border.all(color: _colorBorder, width: 0.5),
       ),
       child: Text(
         label,
@@ -308,6 +333,7 @@ class _ScoreInput extends StatefulWidget {
   final int? value;
   final double width;
   final bool enabled;
+  final Color bgColor;
   final ValueChanged<int?> onChanged;
 
   const _ScoreInput({
@@ -315,6 +341,7 @@ class _ScoreInput extends StatefulWidget {
     required this.value,
     required this.width,
     required this.enabled,
+    this.bgColor = _colorBackground,
     required this.onChanged,
   });
 
@@ -350,7 +377,17 @@ class _ScoreInputState extends State<_ScoreInput> {
     return Container(
       width: widget.width,
       height: _rowHeight,
-      decoration: BoxDecoration(border: Border.all(color: _colorBorder, width: 0.5)),
+      decoration: BoxDecoration(
+        color: widget.bgColor,
+        border: widget.bgColor == _colorWinner
+            ? const Border(
+                left: BorderSide(color: Color(0xFFDAA520), width: 2),
+                right: BorderSide(color: Color(0xFFDAA520), width: 2),
+                top: BorderSide(color: _colorBorder, width: 0.5),
+                bottom: BorderSide(color: _colorBorder, width: 0.5),
+              )
+            : Border.all(color: _colorBorder, width: 0.5),
+      ),
       child: TextField(
         controller: _controller,
         enabled: widget.enabled,
