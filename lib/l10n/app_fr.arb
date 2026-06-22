@@ -1,0 +1,120 @@
+{
+  "@@locale": "fr",
+
+  "appTitle": "Game Score",
+  "chooseGame": "Choisissez un jeu",
+  "freeGame": "Jeu libre",
+  "freeGameSubtitle": "Score par manche, n'importe quel jeu",
+
+  "history": "Historique",
+  "playerBook": "Carnet de joueurs",
+  "newGame": "Nouvelle partie",
+  "start": "Commencer",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "add": "Ajouter",
+  "rename": "Renommer",
+
+  "errorMessage": "Erreur : {message}",
+  "@errorMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+
+  "irreversible": "Cette action est irréversible.",
+  "noGamesRecorded": "Aucune partie enregistrée",
+  "deleteGameQuestion": "Supprimer la partie ?",
+  "inProgress": " — en cours",
+
+  "playersCount": "{count, plural, =1{1 joueur} other{{count} joueurs}}",
+  "@playersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "importJson": "Importer un JSON",
+  "exportJson": "Exporter en JSON",
+
+  "importedGames": "{count, plural, =1{1 partie importée} other{{count} parties importées}}",
+  "@importedGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "noNewGame": "Aucune nouvelle partie à importer",
+  "importError": "Erreur lors de l'import : {error}",
+  "@importError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSaved": "Fichier enregistré dans Téléchargements",
+  "noGameToExport": "Aucune partie à exporter",
+
+  "scoreSheet": "Feuille de score",
+  "gameEnded": "Partie terminée",
+  "totalAbbrev": "T",
+  "roundAbbrev": "M.",
+  "totalLabel": "Total",
+  "roundLabel": "Manche",
+  "endGameQuestion": "Terminer la partie ?",
+  "scoresLocked": "Les scores ne pourront plus être modifiés.",
+  "endGame": "Terminer la partie",
+  "endGameAction": "Terminer",
+
+  "maxPlayers": "Maximum de 7 joueurs",
+  "playerIndex": "Joueur {index}",
+  "@playerIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "gameName": "Nom du jeu",
+  "gameNameHint": "ex : Uno, Catan, Skyjo…",
+
+  "noPlayersRecorded": "Aucun joueur enregistré",
+  "addPlayer": "Ajouter un joueur",
+  "deletePlayerQuestion": "Supprimer {name} ?",
+  "@deletePlayerQuestion": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "duplicateName": "Ce nom existe déjà dans le carnet",
+  "playerNameHint": "Nom du joueur",
+
+  "gamesCount": "{count, plural, =1{1 partie} other{{count} parties}}",
+  "@gamesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "winsCount": "{count, plural, =1{1 victoire} other{{count} victoires}}",
+  "@winsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "genericGame": "Jeu générique",
+  "farawayGame": "Faraway",
+  "gamesPlayed": "Parties jouées",
+  "wins": "Victoires",
+  "averageScore": "Score moyen",
+  "bestScore": "Meilleur score",
+  "worstScore": "Pire score",
+  "noFinishedGame": "Aucune partie terminée",
+
+  "language": "Langue",
+  "systemLanguage": "Système",
+
+  "gameFromDate": "Partie du {date}",
+  "@gameFromDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  }
+}

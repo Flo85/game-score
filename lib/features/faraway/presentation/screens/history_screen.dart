@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/providers.dart';
 import 'game_screen.dart';
 
@@ -9,16 +10,17 @@ class HistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final historyAsync = ref.watch(gameHistoryProvider);
     final repo = ref.read(farawayRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historique'),
+        title: Text(l.history),
         actions: [
           IconButton(
             icon: const Icon(Icons.upload_file),
-            tooltip: 'Importer un JSON',
+            tooltip: l.importJson,
             onPressed: () async {
               final result = await FilePicker.platform.pickFiles(
                 type: FileType.custom,
@@ -32,8 +34,8 @@ class HistoryScreen extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(count > 0
-                          ? '$count partie${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}'
-                          : 'Aucune nouvelle partie à importer'),
+                          ? AppLocalizations.of(context).importedGames(count)
+                          : AppLocalizations.of(context).noNewGame),
                       backgroundColor: count > 0 ? Colors.green : Colors.orange,
                     ),
                   );
@@ -42,7 +44,7 @@ class HistoryScreen extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Erreur lors de l\'import : $e'),
+                      content: Text(AppLocalizations.of(context).importError(e.toString())),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -52,15 +54,15 @@ class HistoryScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.download),
-            tooltip: 'Exporter en JSON',
+            tooltip: l.exportJson,
             onPressed: () async {
               final path = await repo.exportHistory();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(path != null
-                        ? 'Fichier enregistré dans Téléchargements'
-                        : 'Aucune partie à exporter'),
+                        ? AppLocalizations.of(context).fileSaved
+                        : AppLocalizations.of(context).noGameToExport),
                     backgroundColor: path != null ? Colors.green : Colors.orange,
                   ),
                 );
@@ -71,40 +73,43 @@ class HistoryScreen extends ConsumerWidget {
       ),
       body: historyAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text(l.errorMessage(e.toString()))),
         data: (games) {
           if (games.isEmpty) {
-            return const Center(child: Text('Aucune partie enregistrée'));
+            return Center(child: Text(l.noGamesRecorded));
           }
           return ListView.builder(
             itemCount: games.length,
             itemBuilder: (context, i) {
               final game = games[i];
               final date = game.createdAt.toLocal();
-              final label =
-                  'Partie du ${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} '
+              final dateStr =
+                  '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} '
                   '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+              final ll = AppLocalizations.of(context);
 
               return ListTile(
-                title: Text(label),
-                subtitle: Text('${game.players.length} joueurs${game.finished ? '' : ' — en cours'}'),
+                title: Text(ll.gameFromDate(dateStr)),
+                subtitle: Text(
+                  '${ll.playersCount(game.players.length)}${game.finished ? '' : ll.inProgress}',
+                ),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Supprimer la partie ?'),
-                        content: const Text('Cette action est irréversible.'),
+                        title: Text(ll.deleteGameQuestion),
+                        content: Text(ll.irreversible),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Annuler'),
+                            child: Text(ll.cancel),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, true),
                             style: TextButton.styleFrom(foregroundColor: Colors.red),
-                            child: const Text('Supprimer'),
+                            child: Text(ll.delete),
                           ),
                         ],
                       ),

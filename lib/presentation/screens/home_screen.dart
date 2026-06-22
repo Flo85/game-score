@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../features/faraway/presentation/screens/setup_screen.dart';
 import '../../features/generic/presentation/screens/generic_setup_screen.dart';
+import '../../l10n/app_localizations.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          _LanguageDropdown(),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -15,15 +26,15 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              const Text(
-                'Game Score',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+              Text(
+                l.appTitle,
+                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Choisissez un jeu',
-                style: TextStyle(color: Colors.grey),
+              Text(
+                l.chooseGame,
+                style: const TextStyle(color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -45,6 +56,36 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+}
+
+class _LanguageDropdown extends ConsumerWidget {
+  const _LanguageDropdown();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeAsync = ref.watch(localeProvider);
+    final current = localeAsync.when(
+      data: (v) => v?.languageCode ?? 'en',
+      error: (_, __) => 'en',
+      loading: () => 'en',
+    );
+
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: current,
+        items: const [
+          DropdownMenuItem(value: 'fr', child: Text('Français')),
+          DropdownMenuItem(value: 'en', child: Text('English')),
+        ],
+        onChanged: (code) {
+          if (code != null) {
+            ref.read(localeProvider.notifier).setLocale(Locale(code));
+          }
+        },
       ),
     );
   }
@@ -77,6 +118,7 @@ class _GenericGameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -90,15 +132,15 @@ class _GenericGameCard extends StatelessWidget {
               Icon(Icons.casino_outlined,
                   size: 40, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Jeu libre',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                    SizedBox(height: 2),
-                    Text('Score par manche, n\'importe quel jeu',
-                        style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    Text(l.freeGame,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    Text(l.freeGameSubtitle,
+                        style: const TextStyle(color: Colors.grey, fontSize: 13)),
                   ],
                 ),
               ),

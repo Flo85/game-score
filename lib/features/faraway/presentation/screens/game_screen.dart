@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
 
@@ -60,7 +61,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final writable = !game.finished;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Feuille de score')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).scoreSheet)),
       backgroundColor: _colorBackground,
       body: Column(
         children: [
@@ -106,9 +107,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                   // Total
                                   _FixedCell(
                                     color: _colorTotal,
-                                    child: const Text(
-                                      'T',
-                                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, color: Colors.white),
+                                    child: Text(
+                                      AppLocalizations.of(context).totalAbbrev,
+                                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 28, color: Colors.white),
                                     ),
                                   ),
                                 ],
@@ -182,7 +183,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 minimumSize: const Size.fromHeight(48),
                 backgroundColor: _colorTotal,
               ),
-              child: const Text('Partie terminée'),
+              child: Text(AppLocalizations.of(context).gameEnded),
             ),
           ),
         ],

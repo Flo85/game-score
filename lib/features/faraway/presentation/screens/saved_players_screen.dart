@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../presentation/screens/player_stats_screen.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
@@ -12,14 +13,15 @@ class SavedPlayersScreen extends ConsumerWidget {
     final playersAsync = ref.watch(savedPlayersListProvider);
     final repo = ref.read(savedPlayersRepositoryProvider);
 
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Carnet de joueurs')),
+      appBar: AppBar(title: Text(l.playerBook)),
       body: playersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur : $e')),
+        error: (e, _) => Center(child: Text(l.errorMessage(e.toString()))),
         data: (players) {
           if (players.isEmpty) {
-            return const Center(child: Text('Aucun joueur enregistré'));
+            return Center(child: Text(l.noPlayersRecorded));
           }
           return ListView.builder(
             itemCount: players.length,
@@ -61,12 +63,13 @@ class SavedPlayersScreen extends ConsumerWidget {
   }
 
   Future<void> _showAddDialog(BuildContext context, List<Player> existing, Future<void> Function(String) onAdd) async {
+    final l = AppLocalizations.of(context);
     final controller = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => _NameDialog(
-        title: 'Ajouter un joueur',
-        confirmLabel: 'Ajouter',
+        title: l.addPlayer,
+        confirmLabel: l.add,
         controller: controller,
         existingNames: existing.map((p) => p.name).toList(),
       ),
@@ -77,12 +80,13 @@ class SavedPlayersScreen extends ConsumerWidget {
   }
 
   Future<void> _showRenameDialog(BuildContext context, Player player, List<Player> existing, Future<void> Function(String, String) onRename) async {
+    final l = AppLocalizations.of(context);
     final controller = TextEditingController(text: player.name);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => _NameDialog(
-        title: 'Renommer',
-        confirmLabel: 'Renommer',
+        title: l.rename,
+        confirmLabel: l.rename,
         controller: controller,
         existingNames: existing.where((p) => p.id != player.id).map((p) => p.name).toList(),
       ),
@@ -93,17 +97,18 @@ class SavedPlayersScreen extends ConsumerWidget {
   }
 
   Future<void> _showDeleteDialog(BuildContext context, Player player, Future<void> Function(String) onDelete) async {
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Supprimer ${player.name} ?'),
-        content: const Text('Cette action est irréversible.'),
+        title: Text(l.deletePlayerQuestion(player.name)),
+        content: Text(l.irreversible),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -139,7 +144,7 @@ class _NameDialogState extends State<_NameDialog> {
     final isDuplicate = widget.existingNames
         .any((n) => n.toLowerCase() == trimmed.toLowerCase());
     setState(() {
-      _error = isDuplicate ? 'Ce nom existe déjà dans le carnet' : null;
+      _error = isDuplicate ? AppLocalizations.of(context).duplicateName : null;
     });
   }
 
@@ -152,13 +157,13 @@ class _NameDialogState extends State<_NameDialog> {
         autofocus: true,
         textCapitalization: TextCapitalization.words,
         decoration: InputDecoration(
-          hintText: 'Nom du joueur',
+          hintText: AppLocalizations.of(context).playerNameHint,
           errorText: _error,
         ),
         onChanged: _validate,
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context).cancel)),
         TextButton(
           onPressed: _error == null ? () => Navigator.pop(context, true) : null,
           child: Text(widget.confirmLabel),
@@ -182,7 +187,8 @@ class _PlayerStatsSummary extends ConsumerWidget {
       error: (_, __) => const SizedBox.shrink(),
       data: (s) {
         if (s.games == 0) return const SizedBox.shrink();
-        return Text('${s.games} partie${s.games > 1 ? 's' : ''} · ${s.wins} victoire${s.wins > 1 ? 's' : ''}');
+        final l = AppLocalizations.of(context);
+        return Text('${l.gamesCount(s.games)} · ${l.winsCount(s.wins)}');
       },
     );
   }
@@ -231,7 +237,7 @@ class _PlayerPickerSheetState extends ConsumerState<_PlayerPickerSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Carnet de joueurs', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                Text(AppLocalizations.of(context).playerBook, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 TextButton(
                   onPressed: () {
                     final allPlayers = (playersAsync.asData?.value ?? [])
@@ -239,7 +245,7 @@ class _PlayerPickerSheetState extends ConsumerState<_PlayerPickerSheet> {
                         .toList();
                     Navigator.pop(context, allPlayers);
                   },
-                  child: const Text('Ajouter'),
+                  child: Text(AppLocalizations.of(context).add),
                 ),
               ],
             ),
@@ -248,10 +254,10 @@ class _PlayerPickerSheetState extends ConsumerState<_PlayerPickerSheet> {
           Expanded(
             child: playersAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Erreur : $e')),
+              error: (e, _) => Center(child: Text(AppLocalizations.of(context).errorMessage(e.toString()))),
               data: (players) {
                 if (players.isEmpty) {
-                  return const Center(child: Text('Aucun joueur enregistré'));
+                  return Center(child: Text(AppLocalizations.of(context).noPlayersRecorded));
                 }
                 return ListView.builder(
                   controller: scrollController,

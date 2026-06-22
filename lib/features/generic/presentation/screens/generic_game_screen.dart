@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/providers.dart';
 
 const _colFixedWidth = 64.0;
@@ -83,7 +84,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                       width: _colFixedWidth,
                       child: Column(
                         children: [
-                          _HeaderCell(label: 'M.', width: _colFixedWidth, height: _rowHeight),
+                          _HeaderCell(label: AppLocalizations.of(context).roundAbbrev, width: _colFixedWidth, height: _rowHeight),
                           Expanded(
                             child: ListView.builder(
                               controller: _leftScroll,
@@ -96,7 +97,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                                   );
                                 }
                                 return _Cell(
-                                  label: 'Total',
+                                  label: AppLocalizations.of(context).totalLabel,
                                   width: _colFixedWidth,
                                   textColor: _colorTotal,
                                   bold: true,
@@ -179,7 +180,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                     child: OutlinedButton.icon(
                       onPressed: notifier.addRound,
                       icon: const Icon(Icons.add),
-                      label: const Text('Manche'),
+                      label: Text(AppLocalizations.of(context).roundLabel),
                     ),
                   ),
                 if (writable) const SizedBox(width: 12),
@@ -192,23 +193,28 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                         ? () async {
                             final confirm = await showDialog<bool>(
                               context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Terminer la partie ?'),
-                                content: const Text('Les scores ne pourront plus être modifiés.'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () => Navigator.pop(ctx, false),
-                                      child: const Text('Annuler')),
-                                  TextButton(
-                                      onPressed: () => Navigator.pop(ctx, true),
-                                      child: const Text('Terminer')),
-                                ],
-                              ),
+                              builder: (ctx) {
+                                final ll = AppLocalizations.of(ctx);
+                                return AlertDialog(
+                                  title: Text(ll.endGameQuestion),
+                                  content: Text(ll.scoresLocked),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(ctx, false),
+                                        child: Text(ll.cancel)),
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(ctx, true),
+                                        child: Text(ll.endGameAction)),
+                                  ],
+                                );
+                              },
                             );
                             if (confirm == true) await notifier.endGame();
                           }
                         : null,
-                    child: Text(writable ? 'Terminer la partie' : 'Partie terminée'),
+                    child: Text(writable
+                        ? AppLocalizations.of(context).endGame
+                        : AppLocalizations.of(context).gameEnded),
                   ),
                 ),
               ],

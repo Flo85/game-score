@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
 import 'game_screen.dart';
@@ -11,6 +12,7 @@ class SetupScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final players = ref.watch(setupPlayersProvider);
     final notifier = ref.read(setupPlayersProvider.notifier);
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
@@ -21,7 +23,7 @@ class SetupScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.people_outline),
-            tooltip: 'Carnet de joueurs',
+            tooltip: l.playerBook,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SavedPlayersScreen()),
@@ -29,7 +31,7 @@ class SetupScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'Historique',
+            tooltip: l.history,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const HistoryScreen()),
@@ -44,7 +46,7 @@ class SetupScreen extends ConsumerWidget {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
                     }
                   },
-            child: const Text('Commencer'),
+            child: Text(l.start),
           ),
         ],
       ),
@@ -52,19 +54,19 @@ class SetupScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Image.asset('assets/images/logo-faraway.png', width: double.infinity, fit: BoxFit.fitWidth),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(
-              'Nouvelle partie',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+              l.newGame,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 8),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              'Maximum de 7 joueurs',
-              style: TextStyle(color: Colors.grey),
+              l.maxPlayers,
+              style: const TextStyle(color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ),
@@ -195,7 +197,7 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
         return TextField(
           controller: controller,
           focusNode: focusNode,
-          decoration: InputDecoration(labelText: 'Joueur ${widget.index + 1}'),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context).playerIndex(widget.index + 1)),
           textCapitalization: TextCapitalization.words,
           onChanged: widget.onChanged,
         );

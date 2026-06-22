@@ -1,0 +1,120 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Game Score",
+  "chooseGame": "Choose a game",
+  "freeGame": "Free game",
+  "freeGameSubtitle": "Round scores, any game",
+
+  "history": "History",
+  "playerBook": "Players",
+  "newGame": "New game",
+  "start": "Start",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "add": "Add",
+  "rename": "Rename",
+
+  "errorMessage": "Error: {message}",
+  "@errorMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+
+  "irreversible": "This action is irreversible.",
+  "noGamesRecorded": "No games recorded",
+  "deleteGameQuestion": "Delete game?",
+  "inProgress": " — in progress",
+
+  "playersCount": "{count, plural, =1{1 player} other{{count} players}}",
+  "@playersCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "importJson": "Import JSON",
+  "exportJson": "Export JSON",
+
+  "importedGames": "{count, plural, =1{1 game imported} other{{count} games imported}}",
+  "@importedGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "noNewGame": "No new game to import",
+  "importError": "Import error: {error}",
+  "@importError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "fileSaved": "File saved to Downloads",
+  "noGameToExport": "No game to export",
+
+  "scoreSheet": "Score sheet",
+  "gameEnded": "Game ended",
+  "totalAbbrev": "T",
+  "roundAbbrev": "Rnd",
+  "totalLabel": "Total",
+  "roundLabel": "Round",
+  "endGameQuestion": "End game?",
+  "scoresLocked": "Scores can no longer be modified.",
+  "endGame": "End game",
+  "endGameAction": "End",
+
+  "maxPlayers": "Maximum 7 players",
+  "playerIndex": "Player {index}",
+  "@playerIndex": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "gameName": "Game name",
+  "gameNameHint": "e.g. Uno, Catan, Skyjo…",
+
+  "noPlayersRecorded": "No players recorded",
+  "addPlayer": "Add player",
+  "deletePlayerQuestion": "Delete {name}?",
+  "@deletePlayerQuestion": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "duplicateName": "This name already exists",
+  "playerNameHint": "Player name",
+
+  "gamesCount": "{count, plural, =1{1 game} other{{count} games}}",
+  "@gamesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "winsCount": "{count, plural, =1{1 win} other{{count} wins}}",
+  "@winsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "genericGame": "Generic game",
+  "farawayGame": "Faraway",
+  "gamesPlayed": "Games played",
+  "wins": "Wins",
+  "averageScore": "Average score",
+  "bestScore": "Best score",
+  "worstScore": "Worst score",
+  "noFinishedGame": "No finished games",
+
+  "language": "Language",
+  "systemLanguage": "System",
+
+  "gameFromDate": "Game from {date}",
+  "@gameFromDate": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  }
+}

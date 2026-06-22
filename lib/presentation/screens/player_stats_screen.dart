@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/player.dart';
 import '../../features/faraway/domain/providers.dart';
 import '../../features/generic/domain/providers.dart' show genericPlayerStatsProvider;
+import '../../l10n/app_localizations.dart';
 
 class PlayerStatsScreen extends ConsumerWidget {
   final Player player;
@@ -11,6 +12,7 @@ class PlayerStatsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final farawayAsync = ref.watch(farawayPlayerStatsProvider(player.id));
     final genericAsync = ref.watch(genericPlayerStatsProvider(player.id));
 
@@ -19,33 +21,33 @@ class PlayerStatsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionTitle('Jeu générique'),
+          _SectionTitle(l.genericGame),
           genericAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Erreur : $e'),
+            error: (e, _) => Text(l.errorMessage(e.toString())),
             data: (stats) => stats.gamesPlayed == 0
                 ? const _EmptyStats()
                 : Column(
                     children: [
-                      _StatTile('Parties jouées', '${stats.gamesPlayed}'),
-                      _StatTile('Victoires', '${stats.wins}'),
+                      _StatTile(l.gamesPlayed, '${stats.gamesPlayed}'),
+                      _StatTile(l.wins, '${stats.wins}'),
                     ],
                   ),
           ),
           const SizedBox(height: 24),
-          _SectionTitle('Faraway'),
+          _SectionTitle(l.farawayGame),
           farawayAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Erreur : $e'),
+            error: (e, _) => Text(l.errorMessage(e.toString())),
             data: (stats) => stats.gamesPlayed == 0
                 ? const _EmptyStats()
                 : Column(
                     children: [
-                      _StatTile('Parties jouées', '${stats.gamesPlayed}'),
-                      _StatTile('Victoires', '${stats.wins}'),
-                      _StatTile('Score moyen', stats.averageScore.toStringAsFixed(1)),
-                      _StatTile('Meilleur score', '${stats.bestScore}'),
-                      _StatTile('Pire score', '${stats.worstScore}'),
+                      _StatTile(l.gamesPlayed, '${stats.gamesPlayed}'),
+                      _StatTile(l.wins, '${stats.wins}'),
+                      _StatTile(l.averageScore, stats.averageScore.toStringAsFixed(1)),
+                      _StatTile(l.bestScore, '${stats.bestScore}'),
+                      _StatTile(l.worstScore, '${stats.worstScore}'),
                     ],
                   ),
           ),
@@ -91,8 +93,8 @@ class _EmptyStats extends StatelessWidget {
   const _EmptyStats();
 
   @override
-  Widget build(BuildContext context) => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Text('Aucune partie terminée', style: TextStyle(color: Colors.grey)),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(AppLocalizations.of(context).noFinishedGame, style: const TextStyle(color: Colors.grey)),
       );
 }

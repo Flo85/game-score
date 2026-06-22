@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../features/faraway/presentation/screens/saved_players_screen.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
 import 'generic_game_screen.dart';
@@ -11,6 +12,7 @@ class GenericSetupScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final players = ref.watch(genericSetupPlayersProvider);
     final notifier = ref.read(genericSetupPlayersProvider.notifier);
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
@@ -24,7 +26,7 @@ class GenericSetupScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.people_outline),
-            tooltip: 'Carnet de joueurs',
+            tooltip: l.playerBook,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SavedPlayersScreen()),
@@ -32,7 +34,7 @@ class GenericSetupScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'Historique',
+            tooltip: l.history,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const GenericHistoryScreen()),
@@ -52,28 +54,28 @@ class GenericSetupScreen extends ConsumerWidget {
                     }
                   }
                 : null,
-            child: const Text('Commencer'),
+            child: Text(l.start),
           ),
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
             child: Text(
-              'Nouvelle partie',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+              l.newGame,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Nom du jeu',
-                hintText: 'ex : Uno, Catan, Skyjo…',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l.gameName,
+                hintText: l.gameNameHint,
+                border: const OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.words,
               onChanged: (v) => ref.read(genericSetupNameProvider.notifier).set(v),
@@ -204,7 +206,7 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
         return TextField(
           controller: controller,
           focusNode: focusNode,
-          decoration: InputDecoration(labelText: 'Joueur ${widget.index + 1}'),
+          decoration: InputDecoration(labelText: AppLocalizations.of(context).playerIndex(widget.index + 1)),
           textCapitalization: TextCapitalization.words,
           onChanged: widget.onChanged,
         );
