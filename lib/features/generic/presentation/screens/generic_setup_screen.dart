@@ -15,7 +15,9 @@ class GenericSetupScreen extends ConsumerWidget {
     final notifier = ref.read(genericSetupPlayersProvider.notifier);
     final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
     final gameName = ref.watch(genericSetupNameProvider);
-    final canStart = players.isNotEmpty && gameName.trim().isNotEmpty;
+    final canStart = players.isNotEmpty &&
+        gameName.trim().isNotEmpty &&
+        players.every((p) => p.name.trim().isNotEmpty);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,12 +41,9 @@ class GenericSetupScreen extends ConsumerWidget {
           TextButton(
             onPressed: canStart
                 ? () async {
-                    final trimmedPlayers = players
-                        .map((p) => p.copyWith(name: p.name.trim()))
-                        .toList();
                     await ref
                         .read(currentGenericGameProvider.notifier)
-                        .newGame(gameName.trim(), trimmedPlayers);
+                        .newGame(gameName.trim(), players);
                     if (context.mounted) {
                       Navigator.push(
                         context,
@@ -94,15 +93,8 @@ class GenericSetupScreen extends ConsumerWidget {
                     index: i,
                     savedPlayers: savedPlayers,
                     currentPlayers: players,
-                    onChanged: (name) {
-                      final isSavedPlayer = savedPlayers.any((s) => s.id == player.id);
-                      if (isSavedPlayer && name != player.name) {
-                        notifier.setPlayer(player.id, Player.create(name));
-                      } else {
-                        notifier.rename(player.id, name);
-                      }
-                    },
-                    onSavedPlayerSelected: (saved) => notifier.setPlayer(player.id, saved),
+                    onChanged: (name) => notifier.rename(player.id, name),
+                    onSavedPlayerSelected: (saved) => notifier.rename(player.id, saved.name),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -133,7 +125,7 @@ class GenericSetupScreen extends ConsumerWidget {
 
 // ── Champ nom avec autocomplete (identique au setup Faraway) ──────────────────
 
-class _PlayerNameField extends StatelessWidget {
+class _PlayerNameField extends StatefulWidget {
   final Player player;
   final int index;
   final List<Player> savedPlayers;
@@ -151,44 +143,70 @@ class _PlayerNameField extends StatelessWidget {
   });
 
   @override
+  State<_PlayerNameField> createState() => _PlayerNameFieldState();
+}
+
+class _PlayerNameFieldState extends State<_PlayerNameField> {
+  bool _initialized = false;
+  FocusNode? _focusNode;
+  TextEditingController? _controller;
+
+  void _onFocusChange() {
+    final focusNode = _focusNode!;
+    final controller = _controller!;
+    if (focusNode.hasFocus) {
+      controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: controller.text.length,
+      );
+    } else {
+      final trimmed = controller.text.trim();
+      if (trimmed != controller.text) {
+        controller.text = trimmed;
+        widget.onChanged(trimmed);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode?.removeListener(_onFocusChange);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final takenNames = currentPlayers
-        .where((p) => p.id != player.id)
+    final takenNames = widget.currentPlayers
+        .where((p) => p.id != widget.player.id)
         .map((p) => p.name.toLowerCase())
         .toSet();
 
     return Autocomplete<Player>(
-      initialValue: TextEditingValue(text: player.name),
       displayStringForOption: (p) => p.name,
       optionsBuilder: (value) {
         final query = value.text.toLowerCase();
         if (query.isEmpty) return [];
-        return savedPlayers.where(
+        return widget.savedPlayers.where(
           (p) =>
-              p.name.toLowerCase().contains(query) &&
+              p.name.toLowerCase().startsWith(query) &&
               !takenNames.contains(p.name.toLowerCase()),
         );
       },
-      onSelected: onSavedPlayerSelected,
+      onSelected: widget.onSavedPlayerSelected,
       fieldViewBuilder: (context, controller, focusNode, _) {
-        focusNode.addListener(() {
-          if (focusNode.hasFocus) {
-            controller.selection =
-                TextSelection(baseOffset: 0, extentOffset: controller.text.length);
-          } else {
-            final trimmed = controller.text.trim();
-            if (trimmed != controller.text) {
-              controller.text = trimmed;
-              onChanged(trimmed);
-            }
-          }
-        });
+        if (!_initialized) {
+          _initialized = true;
+          _controller = controller;
+          _focusNode = focusNode;
+          controller.text = widget.player.name;
+          focusNode.addListener(_onFocusChange);
+        }
         return TextField(
           controller: controller,
           focusNode: focusNode,
-          decoration: InputDecoration(labelText: 'Joueur ${index + 1}'),
+          decoration: InputDecoration(labelText: 'Joueur ${widget.index + 1}'),
           textCapitalization: TextCapitalization.words,
-          onChanged: onChanged,
+          onChanged: widget.onChanged,
         );
       },
     );

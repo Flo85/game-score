@@ -41,12 +41,29 @@ class CurrentGame extends _$CurrentGame {
 
   Future<void> newGame(List<Player> players) async {
     final repo = ref.read(farawayRepositoryProvider);
+    final savedRepo = ref.read(savedPlayersRepositoryProvider);
     final trimmed = players.map((p) => p.copyWith(name: p.name.trim())).toList();
+
+    // Résolution par nom contre le carnet
+    final savedList = await savedRepo.getAll();
+    final nameToSaved = {for (final p in savedList) p.name.toLowerCase(): p};
+    final resolved = <Player>[];
+    for (final player in trimmed) {
+      final key = player.name.toLowerCase();
+      if (nameToSaved.containsKey(key)) {
+        resolved.add(nameToSaved[key]!);
+      } else {
+        await savedRepo.addPlayer(player);
+        nameToSaved[key] = player;
+        resolved.add(player);
+      }
+    }
+
     final game = FarawayGame(
       id: const Uuid().v4(),
       createdAt: DateTime.now(),
-      players: trimmed,
-      scores: {for (final p in trimmed) p.id: List.filled(farawayNumberOfRows, null)},
+      players: resolved,
+      scores: {for (final p in resolved) p.id: List.filled(farawayNumberOfRows, null)},
       finished: false,
     );
     await repo.saveGame(game);
@@ -105,29 +122,19 @@ class CurrentGame extends _$CurrentGame {
 class SetupPlayers extends _$SetupPlayers {
   @override
   List<Player> build() => [
-        Player.create('Joueur 1'),
-        Player.create('Joueur 2'),
+        Player.create(''),
+        Player.create(''),
       ];
 
   void add() {
     if (state.length >= 7) return;
-    state = [...state, Player.create('Joueur ${state.length + 1}')];
-  }
-
-  void addPlayer(Player player) {
-    if (state.length >= 7) return;
-    state = [...state, Player.create(player.name)];
+    state = [...state, Player.create('')];
   }
 
   void remove(String id) => state = state.where((p) => p.id != id).toList();
 
   void rename(String id, String name) {
     state = state.map((p) => p.id == id ? p.copyWith(name: name) : p).toList();
-  }
-
-  // Remplace un slot par un joueur du carnet (conserve son id pour le suivi)
-  void setPlayer(String slotId, Player savedPlayer) {
-    state = state.map((p) => p.id == slotId ? savedPlayer : p).toList();
   }
 
   void reorder(int from, int to) {

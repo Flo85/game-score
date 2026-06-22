@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
-import '../../../features/faraway/domain/providers.dart' show appDatabaseProvider;
+import '../../../features/faraway/domain/providers.dart' show appDatabaseProvider, savedPlayersRepositoryProvider;
 import '../data/generic_repository.dart';
 import 'models.dart';
 
@@ -18,12 +18,30 @@ class CurrentGenericGame extends _$CurrentGenericGame {
   GenericGame? build() => null;
 
   Future<void> newGame(String name, List<Player> players) async {
+    final savedRepo = ref.read(savedPlayersRepositoryProvider);
+    final trimmed = players.map((p) => p.copyWith(name: p.name.trim())).toList();
+
+    // Résolution par nom contre le carnet
+    final savedList = await savedRepo.getAll();
+    final nameToSaved = {for (final p in savedList) p.name.toLowerCase(): p};
+    final resolved = <Player>[];
+    for (final player in trimmed) {
+      final key = player.name.toLowerCase();
+      if (nameToSaved.containsKey(key)) {
+        resolved.add(nameToSaved[key]!);
+      } else {
+        await savedRepo.addPlayer(player);
+        nameToSaved[key] = player;
+        resolved.add(player);
+      }
+    }
+
     final game = GenericGame(
       id: const Uuid().v4(),
       name: name,
       createdAt: DateTime.now(),
-      players: players,
-      scores: {for (final p in players) p.id: []},
+      players: resolved,
+      scores: {for (final p in resolved) p.id: []},
       finished: false,
     );
     await ref.read(genericRepositoryProvider).saveGame(game);
@@ -85,19 +103,14 @@ class GenericSetupName extends _$GenericSetupName {
 @riverpod
 class GenericSetupPlayers extends _$GenericSetupPlayers {
   @override
-  List<Player> build() => [Player.create('Joueur 1'), Player.create('Joueur 2')];
+  List<Player> build() => [Player.create(''), Player.create('')];
 
-  void add() => state = [...state, Player.create('Joueur ${state.length + 1}')];
-
-  void addPlayer(Player player) => state = [...state, Player.create(player.name)];
+  void add() => state = [...state, Player.create('')];
 
   void remove(String id) => state = state.where((p) => p.id != id).toList();
 
   void rename(String id, String name) =>
       state = state.map((p) => p.id == id ? p.copyWith(name: name) : p).toList();
-
-  void setPlayer(String slotId, Player savedPlayer) =>
-      state = state.map((p) => p.id == slotId ? savedPlayer : p).toList();
 
   void reorder(int from, int to) {
     final list = [...state];
