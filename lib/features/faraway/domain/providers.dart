@@ -49,6 +49,21 @@ Future<({int games, int wins})> playerCarnetSummary(Ref ref, String playerId) as
   return (games: farawayGames + genericGames, wins: farawayWins + genericWins);
 }
 
+@riverpod
+Future<({int games, int wins})> playerStatsByGame(Ref ref, String playerId, String gameType) async {
+  final db = ref.watch(appDatabaseProvider);
+  if (gameType == 'all') {
+    final farGames = await db.countPlayerGames(playerId, 'faraway');
+    final genGames = await db.countPlayerGames(playerId, 'generic');
+    final farWins = await db.countPlayerWins(playerId, 'faraway');
+    final genWins = await db.countPlayerWins(playerId, 'generic');
+    return (games: farGames + genGames, wins: farWins + genWins);
+  }
+  final games = await db.countPlayerGames(playerId, gameType);
+  final wins = await db.countPlayerWins(playerId, gameType);
+  return (games: games, wins: wins);
+}
+
 // ── Partie en cours ────────────────────────────────────────────────────────────
 
 @Riverpod(keepAlive: true)

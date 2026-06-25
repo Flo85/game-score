@@ -89,7 +89,7 @@ final class CurrentGenericGameProvider
 }
 
 String _$currentGenericGameHash() =>
-    r'd8431becd2bc56be127bd5590660ffd629baaf65';
+    r'35dd4bdf2c05e0b8f21af43775c1cbe29c029586';
 
 abstract class _$CurrentGenericGame extends $Notifier<GenericGame?> {
   GenericGame? build();

@@ -99,6 +99,13 @@
     }
   },
 
+  "filterByGame": "Filter by game",
+  "sortBy": "Sort",
+  "allGames": "All",
+  "sortByName": "Name",
+  "sortByWins": "Wins",
+  "sortByGames": "Games",
+
   "genericGame": "Generic game",
   "farawayGame": "Faraway",
   "gamesPlayed": "Games played",

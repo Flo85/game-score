@@ -374,6 +374,42 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 win} other{{count} wins}}'**
   String winsCount(int count);
 
+  /// No description provided for @filterByGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by game'**
+  String get filterByGame;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sortBy;
+
+  /// No description provided for @allGames.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allGames;
+
+  /// No description provided for @sortByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sortByName;
+
+  /// No description provided for @sortByWins.
+  ///
+  /// In en, this message translates to:
+  /// **'Wins'**
+  String get sortByWins;
+
+  /// No description provided for @sortByGames.
+  ///
+  /// In en, this message translates to:
+  /// **'Games'**
+  String get sortByGames;
+
   /// No description provided for @genericGame.
   ///
   /// In en, this message translates to:

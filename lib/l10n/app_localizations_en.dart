@@ -187,6 +187,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get filterByGame => 'Filter by game';
+
+  @override
+  String get sortBy => 'Sort';
+
+  @override
+  String get allGames => 'All';
+
+  @override
+  String get sortByName => 'Name';
+
+  @override
+  String get sortByWins => 'Wins';
+
+  @override
+  String get sortByGames => 'Games';
+
+  @override
   String get genericGame => 'Generic game';
 
   @override

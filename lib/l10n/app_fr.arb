@@ -99,6 +99,13 @@
     }
   },
 
+  "filterByGame": "Filtrer par jeu",
+  "sortBy": "Tri",
+  "allGames": "Tous",
+  "sortByName": "Nom",
+  "sortByWins": "Victoires",
+  "sortByGames": "Parties",
+
   "genericGame": "Jeu générique",
   "farawayGame": "Faraway",
   "gamesPlayed": "Parties jouées",
