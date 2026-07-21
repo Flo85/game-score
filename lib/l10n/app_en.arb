@@ -123,6 +123,10 @@
   "highestScore": "Highest score",
   "lowestScore": "Lowest score",
 
+  "about": "About",
+  "version": "Version",
+  "developedBy": "Developed by Florian Nerrière",
+
   "language": "Language",
   "systemLanguage": "System",
 

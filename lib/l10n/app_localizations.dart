@@ -500,6 +500,24 @@ abstract class AppLocalizations {
   /// **'Lowest score'**
   String get lowestScore;
 
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @developedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Developed by Florian Nerrière'**
+  String get developedBy;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

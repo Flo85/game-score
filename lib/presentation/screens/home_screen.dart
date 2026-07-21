@@ -5,6 +5,7 @@ import '../../features/faraway/presentation/screens/saved_players_screen.dart';
 import '../../features/faraway/presentation/screens/setup_screen.dart';
 import '../../features/generic/presentation/screens/generic_setup_screen.dart';
 import '../../l10n/app_localizations.dart';
+import 'about_screen.dart';
 import 'history_screen.dart';
 import 'import_export_screen.dart';
 
@@ -112,6 +113,18 @@ class _AppDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (_) => const ImportExportScreen()));
+            },
+          ),
+
+          const Divider(),
+
+          // ── À propos ─────────────────────────────────────────────────────
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l.about),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
             },
           ),
 

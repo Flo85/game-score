@@ -252,6 +252,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get lowestScore => 'Score le plus bas';
 
   @override
+  String get about => 'À propos';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get developedBy => 'Développé par Florian Nerrière';
+
+  @override
   String get language => 'Langue';
 
   @override

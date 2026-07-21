@@ -252,6 +252,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lowestScore => 'Lowest score';
 
   @override
+  String get about => 'About';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get developedBy => 'Developed by Florian Nerrière';
+
+  @override
   String get language => 'Language';
 
   @override
