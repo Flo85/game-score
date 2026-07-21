@@ -174,7 +174,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             padding: const EdgeInsets.all(16),
             child: FilledButton(
               onPressed: writable
-                  ? () async { await notifier.endGame(); }
+                  ? () async {
+                      final l = AppLocalizations.of(context);
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(l.endGameQuestion),
+                          content: Text(l.scoresLocked),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel)),
+                            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l.endGameAction)),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) await notifier.endGame();
+                    }
                   : null,
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),

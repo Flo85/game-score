@@ -86,6 +86,7 @@ class SetupScreen extends ConsumerWidget {
                     currentPlayers: players,
                     onChanged: (name) => notifier.rename(player.id, name),
                     onSavedPlayerSelected: (saved) => notifier.rename(player.id, saved.name),
+                    autofocus: i == players.length - 1 && player.name.isEmpty && i > 1,
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -125,6 +126,7 @@ class _PlayerNameField extends StatefulWidget {
   final List<Player> currentPlayers;
   final ValueChanged<String> onChanged;
   final ValueChanged<Player> onSavedPlayerSelected;
+  final bool autofocus;
 
   const _PlayerNameField({
     required this.player,
@@ -133,6 +135,7 @@ class _PlayerNameField extends StatefulWidget {
     required this.currentPlayers,
     required this.onChanged,
     required this.onSavedPlayerSelected,
+    this.autofocus = false,
   });
 
   @override
@@ -193,10 +196,14 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
           _focusNode = focusNode;
           controller.text = widget.player.name;
           focusNode.addListener(_onFocusChange);
+          if (widget.autofocus) {
+            WidgetsBinding.instance.addPostFrameCallback((_) => focusNode.requestFocus());
+          }
         }
         return TextField(
           controller: controller,
           focusNode: focusNode,
+          autofocus: false,
           decoration: InputDecoration(labelText: AppLocalizations.of(context).playerIndex(widget.index + 1)),
           textCapitalization: TextCapitalization.words,
           onChanged: widget.onChanged,
