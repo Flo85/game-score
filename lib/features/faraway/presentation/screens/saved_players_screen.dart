@@ -116,7 +116,7 @@ class _FilterSortBar extends StatelessWidget {
               items: [
                 DropdownMenuItem(value: _GameFilter.all, child: Text(l.allGames)),
                 DropdownMenuItem(value: _GameFilter.faraway, child: Text(l.farawayGame)),
-                DropdownMenuItem(value: _GameFilter.generic, child: Text(l.genericGame)),
+                DropdownMenuItem(value: _GameFilter.generic, child: Text(l.freeGame)),
               ],
               onChanged: (v) { if (v != null) onFilterChanged(v); },
             ),

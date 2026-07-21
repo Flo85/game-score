@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/locale_provider.dart';
-import '../../features/faraway/presentation/screens/history_screen.dart';
 import '../../features/faraway/presentation/screens/saved_players_screen.dart';
 import '../../features/faraway/presentation/screens/setup_screen.dart';
-import '../../features/generic/presentation/screens/generic_history_screen.dart';
 import '../../features/generic/presentation/screens/generic_setup_screen.dart';
 import '../../l10n/app_localizations.dart';
+import 'history_screen.dart';
 import 'import_export_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -97,18 +96,10 @@ class _AppDrawer extends ConsumerWidget {
           // ── Historiques ──────────────────────────────────────────────────
           ListTile(
             leading: const Icon(Icons.history),
-            title: Text(l.farawayHistory),
+            title: Text(l.history),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.history),
-            title: Text(l.genericHistory),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const GenericHistoryScreen()));
             },
           ),
 

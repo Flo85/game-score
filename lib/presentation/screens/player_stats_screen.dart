@@ -21,7 +21,7 @@ class PlayerStatsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _SectionTitle(l.genericGame),
+          _SectionTitle(l.freeGame),
           genericAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text(l.errorMessage(e.toString())),

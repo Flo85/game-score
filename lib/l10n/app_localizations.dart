@@ -440,12 +440,6 @@ abstract class AppLocalizations {
   /// **'Games'**
   String get sortByGames;
 
-  /// No description provided for @genericGame.
-  ///
-  /// In en, this message translates to:
-  /// **'Generic game'**
-  String get genericGame;
-
   /// No description provided for @farawayGame.
   ///
   /// In en, this message translates to:

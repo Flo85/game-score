@@ -4,8 +4,8 @@ import '../../../../features/faraway/presentation/screens/saved_players_screen.d
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
+import '../../../../presentation/screens/history_screen.dart';
 import 'generic_game_screen.dart';
-import 'generic_history_screen.dart';
 
 class GenericSetupScreen extends ConsumerWidget {
   const GenericSetupScreen({super.key});
@@ -38,7 +38,7 @@ class GenericSetupScreen extends ConsumerWidget {
             tooltip: l.history,
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const GenericHistoryScreen()),
+              MaterialPageRoute(builder: (_) => const HistoryScreen(initialFilter: GameFilter.generic)),
             ),
           ),
           TextButton(

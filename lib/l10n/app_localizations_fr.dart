@@ -222,9 +222,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sortByGames => 'Parties';
 
   @override
-  String get genericGame => 'Jeu générique';
-
-  @override
   String get farawayGame => 'Faraway';
 
   @override

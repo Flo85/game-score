@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
+import '../../../../presentation/screens/history_screen.dart';
 import 'game_screen.dart';
-import 'history_screen.dart';
 import 'saved_players_screen.dart';
 
 class SetupScreen extends ConsumerWidget {
@@ -34,7 +34,7 @@ class SetupScreen extends ConsumerWidget {
             tooltip: l.history,
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              MaterialPageRoute(builder: (_) => const HistoryScreen(initialFilter: GameFilter.faraway)),
             ),
           ),
           TextButton(
