@@ -7,6 +7,11 @@
   "freeGameSubtitle": "Round scores, any game",
 
   "history": "History",
+  "farawayHistory": "Faraway history",
+  "genericHistory": "Free game history",
+  "importExport": "Import / Export",
+  "exportAllDescription": "Exports all games to a JSON file to share or save",
+  "importAllDescription": "Imports games from a JSON file exported from this app",
   "playerBook": "Players",
   "newGame": "New game",
   "start": "Start",

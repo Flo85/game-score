@@ -24,6 +24,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get history => 'History';
 
   @override
+  String get farawayHistory => 'Faraway history';
+
+  @override
+  String get genericHistory => 'Free game history';
+
+  @override
+  String get importExport => 'Import / Export';
+
+  @override
+  String get exportAllDescription =>
+      'Exports all games to a JSON file to share or save';
+
+  @override
+  String get importAllDescription =>
+      'Imports games from a JSON file exported from this app';
+
+  @override
   String get playerBook => 'Players';
 
   @override

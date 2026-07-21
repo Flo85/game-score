@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/database/app_database.dart';
 import '../domain/models.dart';
 
@@ -53,6 +54,48 @@ class GenericRepository {
   }
 
   Future<void> deleteGame(String id) => _db.deleteGame(id);
+
+
+  Future<int> importHistoryFromJson(List<Map<String, dynamic>> raw) async {
+    final savedRows = await _db.watchSavedPlayers().first;
+    final nameToSaved = <String, SavedPlayer>{
+      for (final p in savedRows) p.name.toLowerCase(): p,
+    };
+    var imported = 0;
+    for (final gameJson in raw) {
+      final game = GenericGame.fromJson(gameJson);
+      final existing = await _db.getGame(game.id);
+      if (existing != null) continue;
+      final idRemap = <String, String>{};
+      final resolvedPlayers = <Player>[];
+      for (final player in game.players) {
+        final key = player.name.toLowerCase();
+        if (nameToSaved.containsKey(key)) {
+          final saved = nameToSaved[key]!;
+          idRemap[player.id] = saved.id;
+          resolvedPlayers.add(Player(id: saved.id, name: saved.name));
+        } else {
+          final newId = const Uuid().v4();
+          await _db.upsertSavedPlayer(SavedPlayersCompanion(id: Value(newId), name: Value(player.name)));
+          final newSaved = SavedPlayer(id: newId, name: player.name);
+          nameToSaved[key] = newSaved;
+          idRemap[player.id] = newId;
+          resolvedPlayers.add(Player(id: newId, name: player.name));
+        }
+      }
+      final remappedScores = <String, List<int?>>{};
+      game.scores.forEach((oldId, scores) {
+        remappedScores[idRemap[oldId] ?? oldId] = scores;
+      });
+      final resolved = game.copyWith(players: resolvedPlayers, scores: remappedScores);
+      final winnerIds = resolved.winnerIds.isNotEmpty
+          ? resolved.winnerIds.map((id) => idRemap[id] ?? id).toList()
+          : GenericRepository.computeWinner(resolved);
+      await saveGame(resolved.copyWith(winnerIds: winnerIds));
+      imported++;
+    }
+    return imported;
+  }
 
   GenericGame _rowToGame(Game row, List<GamePlayer> gp) {
     final players = gp.map((r) => Player(id: r.playerId, name: r.playerName)).toList();

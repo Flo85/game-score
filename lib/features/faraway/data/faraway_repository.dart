@@ -72,10 +72,7 @@ class FarawayRepository {
   }
 
   // Retourne le nombre de parties importées
-  Future<int> importHistory(String filePath) async {
-    final raw = jsonDecode(await File(filePath).readAsString()) as List;
-
-    // Charger les joueurs du carnet indexés par nom (insensible à la casse)
+  Future<int> importHistoryFromJson(List<Map<String, dynamic>> raw) async {
     final savedRows = await _db.watchSavedPlayers().first;
     final nameToSaved = <String, SavedPlayer>{
       for (final p in savedRows) p.name.toLowerCase(): p,
@@ -84,7 +81,7 @@ class FarawayRepository {
     var imported = 0;
 
     for (final gameJson in raw) {
-      final game = FarawayGame.fromJson(gameJson as Map<String, dynamic>);
+      final game = FarawayGame.fromJson(gameJson);
 
       // Ignorer les parties déjà présentes
       final existing = await _db.getGame(game.id);

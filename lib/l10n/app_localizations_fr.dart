@@ -24,6 +24,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get history => 'Historique';
 
   @override
+  String get farawayHistory => 'Historique Faraway';
+
+  @override
+  String get genericHistory => 'Historique Jeu libre';
+
+  @override
+  String get importExport => 'Import / Export';
+
+  @override
+  String get exportAllDescription =>
+      'Exporte toutes les parties dans un fichier JSON à partager ou sauvegarder';
+
+  @override
+  String get importAllDescription =>
+      'Importe les parties depuis un fichier JSON exporté depuis cette app';
+
+  @override
   String get playerBook => 'Carnet de joueurs';
 
   @override

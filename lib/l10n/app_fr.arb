@@ -7,6 +7,11 @@
   "freeGameSubtitle": "Score par manche, n'importe quel jeu",
 
   "history": "Historique",
+  "farawayHistory": "Historique Faraway",
+  "genericHistory": "Historique Jeu libre",
+  "importExport": "Import / Export",
+  "exportAllDescription": "Exporte toutes les parties dans un fichier JSON à partager ou sauvegarder",
+  "importAllDescription": "Importe les parties depuis un fichier JSON exporté depuis cette app",
   "playerBook": "Carnet de joueurs",
   "newGame": "Nouvelle partie",
   "start": "Commencer",

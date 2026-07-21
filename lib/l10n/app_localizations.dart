@@ -128,6 +128,36 @@ abstract class AppLocalizations {
   /// **'History'**
   String get history;
 
+  /// No description provided for @farawayHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Faraway history'**
+  String get farawayHistory;
+
+  /// No description provided for @genericHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Free game history'**
+  String get genericHistory;
+
+  /// No description provided for @importExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import / Export'**
+  String get importExport;
+
+  /// No description provided for @exportAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Exports all games to a JSON file to share or save'**
+  String get exportAllDescription;
+
+  /// No description provided for @importAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Imports games from a JSON file exported from this app'**
+  String get importAllDescription;
+
   /// No description provided for @playerBook.
   ///
   /// In en, this message translates to:

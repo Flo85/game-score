@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/locale_provider.dart';
+import '../../features/faraway/presentation/screens/history_screen.dart';
+import '../../features/faraway/presentation/screens/saved_players_screen.dart';
 import '../../features/faraway/presentation/screens/setup_screen.dart';
+import '../../features/generic/presentation/screens/generic_history_screen.dart';
 import '../../features/generic/presentation/screens/generic_setup_screen.dart';
 import '../../l10n/app_localizations.dart';
+import 'import_export_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,12 +17,8 @@ class HomeScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          _LanguageDropdown(),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: AppBar(title: Text(l.appTitle)),
+      drawer: const _AppDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -26,12 +26,6 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              Text(
-                l.appTitle,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
               Text(
                 l.chooseGame,
                 style: const TextStyle(color: Colors.grey),
@@ -59,37 +53,103 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-
 }
 
-class _LanguageDropdown extends ConsumerWidget {
-  const _LanguageDropdown();
+// ── Drawer ────────────────────────────────────────────────────────────────────
+
+class _AppDrawer extends ConsumerWidget {
+  const _AppDrawer();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final localeAsync = ref.watch(localeProvider);
-    final current = localeAsync.when(
+    final currentLocale = localeAsync.when(
       data: (v) => v?.languageCode ?? 'en',
       error: (_, __) => 'en',
       loading: () => 'en',
     );
 
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: current,
-        items: const [
-          DropdownMenuItem(value: 'fr', child: Text('Français')),
-          DropdownMenuItem(value: 'en', child: Text('English')),
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
+            child: Text(
+              l.appTitle,
+              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700),
+            ),
+          ),
+
+          // ── Joueurs ──────────────────────────────────────────────────────
+          ListTile(
+            leading: const Icon(Icons.people_outline),
+            title: Text(l.playerBook),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedPlayersScreen()));
+            },
+          ),
+
+          const Divider(),
+
+          // ── Historiques ──────────────────────────────────────────────────
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(l.farawayHistory),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(l.genericHistory),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const GenericHistoryScreen()));
+            },
+          ),
+
+          const Divider(),
+
+          // ── Import / Export ──────────────────────────────────────────────
+          ListTile(
+            leading: const Icon(Icons.import_export),
+            title: Text(l.importExport),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ImportExportScreen()));
+            },
+          ),
+
+          const Divider(),
+
+          // ── Langue ───────────────────────────────────────────────────────
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(l.language),
+            trailing: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: currentLocale,
+                items: const [
+                  DropdownMenuItem(value: 'fr', child: Text('Français')),
+                  DropdownMenuItem(value: 'en', child: Text('English')),
+                ],
+                onChanged: (code) {
+                  if (code != null) ref.read(localeProvider.notifier).setLocale(Locale(code));
+                },
+              ),
+            ),
+          ),
         ],
-        onChanged: (code) {
-          if (code != null) {
-            ref.read(localeProvider.notifier).setLocale(Locale(code));
-          }
-        },
       ),
     );
   }
 }
+
+// ── Cartes jeux ───────────────────────────────────────────────────────────────
 
 class _GameCard extends StatelessWidget {
   final String image;
