@@ -261,6 +261,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get developedBy => 'Développé par Florian Nerrière';
 
   @override
+  String get supportOnKofi => 'Soutenir le développement sur Ko-fi';
+
+  @override
   String get language => 'Langue';
 
   @override

@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Developed by Florian Nerrière'**
   String get developedBy;
 
+  /// No description provided for @supportOnKofi.
+  ///
+  /// In en, this message translates to:
+  /// **'Support development on Ko-fi'**
+  String get supportOnKofi;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

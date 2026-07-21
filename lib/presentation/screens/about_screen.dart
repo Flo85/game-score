@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/app_localizations.dart';
+
+const _kofiUrl = 'https://ko-fi.com/floriannerriere';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -18,6 +21,10 @@ class _AboutScreenState extends State<AboutScreen> {
     PackageInfo.fromPlatform().then((info) {
       if (mounted) setState(() => _info = info);
     });
+  }
+
+  Future<void> _openKofi() async {
+    await launchUrl(Uri.parse(_kofiUrl), mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -55,6 +62,17 @@ class _AboutScreenState extends State<AboutScreen> {
             l.developedBy,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+          const SizedBox(height: 32),
+          OutlinedButton.icon(
+            onPressed: _openKofi,
+            icon: const Text('☕', style: TextStyle(fontSize: 18)),
+            label: Text(l.supportOnKofi),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF29ABE0),
+              side: const BorderSide(color: Color(0xFF29ABE0)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
           ),
         ],
       ),
