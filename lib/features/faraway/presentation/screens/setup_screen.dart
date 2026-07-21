@@ -147,7 +147,7 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
   FocusNode? _focusNode;
   TextEditingController? _controller;
 
-  void _onFocusChange() {
+  void _onFocusChange(BuildContext fieldContext) {
     final focusNode = _focusNode!;
     final controller = _controller!;
     if (focusNode.hasFocus) {
@@ -155,6 +155,15 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
         baseOffset: 0,
         extentOffset: controller.text.length,
       );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!fieldContext.mounted) return;
+        Scrollable.ensureVisible(
+          fieldContext,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+        );
+      });
     } else {
       final trimmed = controller.text.trim();
       if (trimmed != controller.text) {
@@ -166,7 +175,7 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
 
   @override
   void dispose() {
-    _focusNode?.removeListener(_onFocusChange);
+    _focusNode?.removeListener(() {});
     super.dispose();
   }
 
@@ -195,7 +204,7 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
           _controller = controller;
           _focusNode = focusNode;
           controller.text = widget.player.name;
-          focusNode.addListener(_onFocusChange);
+          focusNode.addListener(() => _onFocusChange(context));
           if (widget.autofocus) {
             WidgetsBinding.instance.addPostFrameCallback((_) => focusNode.requestFocus());
           }
