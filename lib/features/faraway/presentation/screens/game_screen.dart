@@ -174,16 +174,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             padding: const EdgeInsets.all(16),
             child: FilledButton(
               onPressed: writable
-                  ? () async {
-                      await notifier.endGame();
-                      if (context.mounted) Navigator.pop(context);
-                    }
+                  ? () async { await notifier.endGame(); }
                   : null,
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
-                backgroundColor: _colorTotal,
+                backgroundColor: writable ? _colorTotal : Colors.grey,
               ),
-              child: Text(AppLocalizations.of(context).gameEnded),
+              child: Text(writable
+                  ? AppLocalizations.of(context).endGame
+                  : AppLocalizations.of(context).gameEnded),
             ),
           ),
         ],
