@@ -7,15 +7,19 @@ Application mobile Android de suivi de scores pour jeux de société, développ�
 - **Faraway** — feuille de score dédiée au jeu de cartes Faraway (9 lignes, sanctuaire, icônes du jeu)
 - **Jeu libre** — suivi de scores par manche pour n'importe quel jeu, nombre de manches illimité
 - **Carnet de joueurs** — sauvegarde des joueurs fréquents avec autocomplétion à la création de partie
-- **Historique** — consultation et suppression des parties passées par type de jeu
-- **Export JSON** — export de l'historique Faraway dans le dossier Téléchargements
+- **Historique unifié** — consultation et suppression des parties passées, filtrable par type de jeu
+- **Import / Export JSON** — sauvegarde et restauration de l'historique complet de tous les jeux
+- **Multilingue** — français et anglais
+- **À propos** — version de l'app et lien de soutien Ko-fi
 
 ## Stack technique
 
 - **Flutter** 3.x / Dart
 - **Riverpod** (riverpod_annotation + riverpod_generator) — gestion d'état
 - **Drift** (drift_flutter) — base de données SQLite locale
-- **path_provider** — accès au système de fichiers
+- **file_picker** — import / export de fichiers
+- **package_info_plus** — version de l'app au runtime
+- **url_launcher** — ouverture de liens externes
 
 ## Structure du projet
 
@@ -23,19 +27,20 @@ Application mobile Android de suivi de scores pour jeux de société, développ�
 lib/
 ├── core/
 │   ├── database/        # Schéma Drift et méthodes DB
-│   └── models/          # Modèles partagés (Player)
+│   ├── models/          # Modèles partagés (Player)
+│   └── providers/       # Providers globaux (locale)
 ├── features/
 │   ├── faraway/         # Jeu Faraway (domain, data, presentation)
 │   └── generic/         # Jeu libre (domain, data, presentation)
 └── presentation/
-    └── screens/         # Écran d'accueil
+    └── screens/         # Écrans partagés (accueil, historique, import/export, à propos)
 ```
 
 ## Base de données
 
 | Table | Colonnes |
 |---|---|
-| `games` | `id`, `created_at`, `game_type`, `name`, `finished` |
+| `games` | `id`, `created_at`, `game_type`, `name`, `finished`, `winner_id` |
 | `game_players` | `game_id`, `player_id`, `player_name`, `position`, `scores_json` |
 | `saved_players` | `id`, `name` |
 
@@ -49,7 +54,7 @@ flutter run
 
 ## Build release
 
-Le workflow GitHub Actions `.github/workflows/android.yml` génère automatiquement un APK signé à chaque push sur `main`. Les secrets à configurer dans le dépôt :
+Le workflow GitHub Actions `.github/workflows/android.yml` génère automatiquement un APK et un AAB signés à chaque push sur `main`. Les secrets à configurer dans le dépôt :
 
 | Secret | Description |
 |---|---|
