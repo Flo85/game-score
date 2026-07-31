@@ -16,4 +16,4 @@ The app may request access to device storage solely to allow importing and expor
 
 ## Contact
 
-For any questions: florian.nerriere@gmail.com
+For any questions: florian.nerriere.dev@gmail.com
