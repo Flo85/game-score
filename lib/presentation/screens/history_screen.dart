@@ -85,6 +85,7 @@ class _Entry {
   final String id;
   final String title;
   final String subtitle;
+  final String? winnerLine;
   final bool finished;
   final DateTime createdAt;
   final String gameType;
@@ -96,6 +97,7 @@ class _Entry {
     required this.finished,
     required this.createdAt,
     required this.gameType,
+    this.winnerLine,
   });
 
   factory _Entry.faraway(dynamic game, AppLocalizations l) {
@@ -103,6 +105,7 @@ class _Entry {
     final dateStr = _fmt(date);
     final finished = game.finished as bool;
     final playerCount = (game.players as List).length;
+    final winnerLine = finished ? _buildWinnerLine(game) : null;
     return _Entry(
       id: game.id as String,
       title: 'Faraway',
@@ -110,6 +113,7 @@ class _Entry {
       finished: finished,
       createdAt: game.createdAt as DateTime,
       gameType: 'faraway',
+      winnerLine: winnerLine,
     );
   }
 
@@ -118,6 +122,7 @@ class _Entry {
     final dateStr = _fmt(date);
     final finished = game.finished as bool;
     final playerCount = (game.players as List).length;
+    final winnerLine = finished ? _buildWinnerLine(game) : null;
     return _Entry(
       id: game.id as String,
       title: '${game.name as String} (${l.freeGame})',
@@ -125,7 +130,25 @@ class _Entry {
       finished: finished,
       createdAt: game.createdAt as DateTime,
       gameType: 'generic',
+      winnerLine: winnerLine,
     );
+  }
+
+  static String? _buildWinnerLine(dynamic game) {
+    final winnerIds = game.winnerIds as List<String>;
+    if (winnerIds.isEmpty) return null;
+    final players = game.players as List;
+    final names = <String>[];
+    int? sharedTotal;
+    for (final id in winnerIds) {
+      final player = players.where((p) => p.id == id).firstOrNull;
+      if (player == null) continue;
+      names.add(player.name as String);
+      sharedTotal ??= game.playerTotal(id) as int?;
+    }
+    if (names.isEmpty) return null;
+    final score = sharedTotal != null ? ' ($sharedTotal ${sharedTotal!.abs() > 1 ? 'pts' : 'pt'})' : '';
+    return '🏆 ${names.join(', ')}$score';
   }
 
   static String _fmt(DateTime d) =>
@@ -144,7 +167,18 @@ class _EntryTile extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     return ListTile(
       title: Text(entry.title),
-      subtitle: Text(entry.subtitle),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(entry.subtitle),
+          if (entry.winnerLine != null)
+            Text(
+              entry.winnerLine!,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+        ],
+      ),
+      isThreeLine: entry.winnerLine != null,
       trailing: IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
         onPressed: () => _confirmDelete(context, ref, l),

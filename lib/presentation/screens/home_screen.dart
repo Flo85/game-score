@@ -66,7 +66,7 @@ class _AppDrawer extends ConsumerWidget {
     final localeAsync = ref.watch(localeProvider);
     final currentLocale = localeAsync.when(
       data: (v) => v?.languageCode ?? 'en',
-      error: (_, __) => 'en',
+      error: (_, _) => 'en',
       loading: () => 'en',
     );
 

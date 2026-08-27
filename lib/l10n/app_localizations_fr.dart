@@ -62,6 +62,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rename => 'Renommer';
 
   @override
+  String get merge => 'Fusionner';
+
+  @override
+  String get mergePlayersHint =>
+      'Un joueur avec ce nom existe déjà — confirmer pour fusionner';
+
+  @override
+  String get mergePlayersQuestion => 'Fusionner les joueurs ?';
+
+  @override
+  String mergePlayersWarning(String from, String to) {
+    return 'Toutes les parties de $from seront attribuées à $to. Cette action est irréversible.';
+  }
+
+  @override
   String errorMessage(String message) {
     return 'Erreur : $message';
   }

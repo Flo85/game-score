@@ -72,18 +72,18 @@ class _SavedPlayersScreenState extends ConsumerState<SavedPlayersScreen> {
   Future<void> _showAddDialog(BuildContext context, List<Player> existing, Future<void> Function(String) onAdd) async {
     final l = AppLocalizations.of(context);
     final controller = TextEditingController();
-    final confirmed = await showDialog<bool>(
+    final result = await showDialog<({bool confirmed, bool isMerge})>(
       context: context,
       builder: (ctx) => _NameDialog(
         title: l.addPlayer,
         confirmLabel: l.add,
         controller: controller,
-        existingNames: existing.map((p) => p.name).toList(),
+        existingPlayers: existing,
       ),
     );
-    if (confirmed == true && controller.text.trim().isNotEmpty) {
-      await onAdd(controller.text.trim());
-    }
+    if (result == null || !result.confirmed || result.isMerge) return;
+    final name = controller.text.trim();
+    if (name.isNotEmpty) await onAdd(name);
   }
 }
 
@@ -214,7 +214,6 @@ class _SortedPlayerList extends ConsumerWidget {
   }
 
   Widget _buildList(BuildContext context, WidgetRef ref, List<Player> sorted) {
-    final l = AppLocalizations.of(context);
     return ListView.builder(
       itemCount: sorted.length,
       itemBuilder: (context, i) {
@@ -247,17 +246,41 @@ class _SortedPlayerList extends ConsumerWidget {
   Future<void> _showRenameDialog(BuildContext context, WidgetRef ref, Player player, List<Player> all) async {
     final l = AppLocalizations.of(context);
     final controller = TextEditingController(text: player.name);
-    final confirmed = await showDialog<bool>(
+    final others = all.where((p) => p.id != player.id).toList();
+    final result = await showDialog<({bool confirmed, bool isMerge})>(
       context: context,
       builder: (ctx) => _NameDialog(
         title: l.rename,
         confirmLabel: l.rename,
         controller: controller,
-        existingNames: all.where((p) => p.id != player.id).map((p) => p.name).toList(),
+        existingPlayers: others,
       ),
     );
-    if (confirmed == true && controller.text.trim().isNotEmpty) {
-      await repo.rename(player.id, controller.text.trim());
+    if (result == null || !result.confirmed) return;
+    final newName = controller.text.trim();
+    if (newName.isEmpty) return;
+
+    if (result.isMerge) {
+      final target = others.firstWhere((p) => p.name.toLowerCase() == newName.toLowerCase());
+      if (!context.mounted) return;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l.mergePlayersQuestion),
+          content: Text(l.mergePlayersWarning(player.name, target.name)),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel)),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: Text(l.merge),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) await repo.merge(player.id, target.id);
+    } else {
+      await repo.rename(player.id, newName);
     }
   }
 
@@ -294,7 +317,7 @@ class _PlayerStatsSummary extends ConsumerWidget {
     final summaryAsync = ref.watch(playerStatsByGameProvider(playerId, gameType));
     return summaryAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (s) {
         if (s.games == 0) return const SizedBox.shrink();
         final l = AppLocalizations.of(context);
@@ -304,19 +327,19 @@ class _PlayerStatsSummary extends ConsumerWidget {
   }
 }
 
-// ── Dialogue de saisie de nom avec validation doublon ─────────────────────────
+// ── Dialogue de saisie de nom avec détection doublon / fusion ────────────────
 
 class _NameDialog extends StatefulWidget {
   final String title;
   final String confirmLabel;
   final TextEditingController controller;
-  final List<String> existingNames;
+  final List<Player> existingPlayers;
 
   const _NameDialog({
     required this.title,
     required this.confirmLabel,
     required this.controller,
-    required this.existingNames,
+    required this.existingPlayers,
   });
 
   @override
@@ -324,39 +347,56 @@ class _NameDialog extends StatefulWidget {
 }
 
 class _NameDialogState extends State<_NameDialog> {
-  String? _error;
+  bool _isMerge = false;
 
   void _validate(String value) {
     final trimmed = value.trim();
-    final isDuplicate = widget.existingNames.any((n) => n.toLowerCase() == trimmed.toLowerCase());
-    setState(() {
-      _error = isDuplicate ? AppLocalizations.of(context).duplicateName : null;
-    });
+    final isDuplicate = widget.existingPlayers.any((p) => p.name.toLowerCase() == trimmed.toLowerCase());
+    setState(() => _isMerge = isDuplicate);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(widget.title),
-      content: TextField(
-        controller: widget.controller,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        decoration: InputDecoration(
-          hintText: AppLocalizations.of(context).playerNameHint,
-          errorText: _error,
-        ),
-        onChanged: _validate,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: widget.controller,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(hintText: l.playerNameHint),
+            onChanged: _validate,
+          ),
+          if (_isMerge)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                l.mergePlayersHint,
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+              ),
+            ),
+        ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context).cancel)),
         TextButton(
-          onPressed: _error == null ? () => Navigator.pop(context, true) : null,
-          child: Text(widget.confirmLabel),
+          onPressed: () => Navigator.pop(context, (confirmed: false, isMerge: false)),
+          child: Text(l.cancel),
+        ),
+        TextButton(
+          onPressed: controller.text.trim().isEmpty
+              ? null
+              : () => Navigator.pop(context, (confirmed: true, isMerge: _isMerge)),
+          child: Text(_isMerge ? l.merge : widget.confirmLabel),
         ),
       ],
     );
   }
+
+  TextEditingController get controller => widget.controller;
 }
 
 // ── Bottom sheet de sélection ─────────────────────────────────────────────────

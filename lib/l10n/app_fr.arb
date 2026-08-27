@@ -19,6 +19,16 @@
   "delete": "Supprimer",
   "add": "Ajouter",
   "rename": "Renommer",
+  "merge": "Fusionner",
+  "mergePlayersHint": "Un joueur avec ce nom existe déjà — confirmer pour fusionner",
+  "mergePlayersQuestion": "Fusionner les joueurs ?",
+  "mergePlayersWarning": "Toutes les parties de {from} seront attribuées à {to}. Cette action est irréversible.",
+  "@mergePlayersWarning": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
 
   "errorMessage": "Erreur : {message}",
   "@errorMessage": {

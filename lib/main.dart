@@ -20,7 +20,7 @@ class GameScoreApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localeAsync = ref.watch(localeProvider);
-    final locale = localeAsync.when(data: (v) => v, error: (_, __) => null, loading: () => null);
+    final locale = localeAsync.when(data: (v) => v, error: (_, _) => null, loading: () => null);
 
     return MaterialApp(
       title: 'Game Score',

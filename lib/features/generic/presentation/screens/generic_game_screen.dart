@@ -178,7 +178,9 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
             ),
           ),
           // ── Boutons bas ────────────────────────────────────────────────
-          Padding(
+          SafeArea(
+            top: false,
+            child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
@@ -226,6 +228,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                 ),
               ],
             ),
+          ),
           ),
         ],
       ),

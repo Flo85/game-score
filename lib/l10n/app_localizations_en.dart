@@ -62,6 +62,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rename => 'Rename';
 
   @override
+  String get merge => 'Merge';
+
+  @override
+  String get mergePlayersHint =>
+      'A player with this name already exists — confirm to merge';
+
+  @override
+  String get mergePlayersQuestion => 'Merge players?';
+
+  @override
+  String mergePlayersWarning(String from, String to) {
+    return 'All games from $from will be attributed to $to. This action is irreversible.';
+  }
+
+  @override
   String errorMessage(String message) {
     return 'Error: $message';
   }

@@ -123,4 +123,29 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteSavedPlayer(String id) =>
       (delete(savedPlayers)..where((p) => p.id.equals(id))).go();
+
+  Future<void> mergePlayer(String fromId, String toId) async {
+    await transaction(() async {
+      // Réassigner les lignes game_players
+      await customUpdate(
+        'UPDATE game_players SET player_id = ? WHERE player_id = ?',
+        variables: [Variable.withString(toId), Variable.withString(fromId)],
+        updates: {gamePlayers},
+      );
+      // Mettre à jour winner_id (chaîne CSV) — padding avec virgules pour éviter les faux positifs
+      await customUpdate(
+        "UPDATE games SET winner_id = trim(replace(',' || winner_id || ',', ',' || ? || ',', ',' || ? || ','), ',')"
+        ' WHERE winner_id IS NOT NULL'
+        "  AND instr(',' || winner_id || ',', ',' || ? || ',') > 0",
+        variables: [
+          Variable.withString(fromId),
+          Variable.withString(toId),
+          Variable.withString(fromId),
+        ],
+        updates: {games},
+      );
+      // Supprimer l'ancien joueur du carnet
+      await deleteSavedPlayer(fromId);
+    });
+  }
 }

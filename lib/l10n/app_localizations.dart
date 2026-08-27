@@ -200,6 +200,30 @@ abstract class AppLocalizations {
   /// **'Rename'**
   String get rename;
 
+  /// No description provided for @merge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get merge;
+
+  /// No description provided for @mergePlayersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A player with this name already exists — confirm to merge'**
+  String get mergePlayersHint;
+
+  /// No description provided for @mergePlayersQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge players?'**
+  String get mergePlayersQuestion;
+
+  /// No description provided for @mergePlayersWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'All games from {from} will be attributed to {to}. This action is irreversible.'**
+  String mergePlayersWarning(String from, String to);
+
   /// No description provided for @errorMessage.
   ///
   /// In en, this message translates to:

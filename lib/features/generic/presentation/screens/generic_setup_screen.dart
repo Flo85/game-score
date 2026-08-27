@@ -102,6 +102,7 @@ class GenericSetupScreen extends ConsumerWidget {
               itemCount: players.length,
               onReorderItem: notifier.reorder,
               buildDefaultDragHandles: false,
+              padding: const EdgeInsets.only(bottom: 160),
               itemBuilder: (context, i) {
                 final player = players[i];
                 return ListTile(
@@ -171,7 +172,6 @@ class _PlayerNameFieldState extends State<_PlayerNameField> {
   bool _initialized = false;
   FocusNode? _focusNode;
   TextEditingController? _controller;
-
   void _onFocusChange(BuildContext fieldContext) {
     final focusNode = _focusNode!;
     final controller = _controller!;

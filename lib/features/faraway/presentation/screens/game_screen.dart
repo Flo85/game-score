@@ -170,7 +170,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               },
             ),
           ),
-          Padding(
+          SafeArea(
+            top: false,
+            child: Padding(
             padding: const EdgeInsets.all(16),
             child: FilledButton(
               onPressed: writable
@@ -198,6 +200,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ? AppLocalizations.of(context).endGame
                   : AppLocalizations.of(context).gameEnded),
             ),
+          ),
           ),
         ],
       ),

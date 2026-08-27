@@ -30,4 +30,6 @@ class SavedPlayersRepository {
       );
 
   Future<void> delete(String id) => _db.deleteSavedPlayer(id);
+
+  Future<void> merge(String fromId, String toId) => _db.mergePlayer(fromId, toId);
 }

@@ -19,6 +19,16 @@
   "delete": "Delete",
   "add": "Add",
   "rename": "Rename",
+  "merge": "Merge",
+  "mergePlayersHint": "A player with this name already exists — confirm to merge",
+  "mergePlayersQuestion": "Merge players?",
+  "mergePlayersWarning": "All games from {from} will be attributed to {to}. This action is irreversible.",
+  "@mergePlayersWarning": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
 
   "errorMessage": "Error: {message}",
   "@errorMessage": {
