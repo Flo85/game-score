@@ -62,6 +62,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rename => 'Renommer';
 
   @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get teams => 'Équipes';
+
+  @override
+  String get team => 'Équipe';
+
+  @override
+  String get teamTotal => 'Total équipe';
+
+  @override
+  String get addTeam => 'Ajouter une équipe';
+
+  @override
+  String get assignPlayers => 'Joueurs à assigner';
+
+  @override
+  String get removeFromTeam => 'Déposer ici pour retirer de l\'équipe';
+
+  @override
+  String get removeTeams => 'Supprimer les équipes';
+
+  @override
+  String get teamsOff => 'Inactif';
+
+  @override
+  String get teamsIncomplete => 'À compléter';
+
+  @override
+  String get chooseTeam => 'Choisir une équipe';
+
+  @override
   String get merge => 'Fusionner';
 
   @override
@@ -154,6 +187,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get roundLabel => 'Manche';
 
   @override
+  String get deleteRoundQuestion => 'Supprimer la dernière manche ?';
+
+  @override
+  String get deleteRoundWarning =>
+      'Cette manche contient des scores qui seront définitivement supprimés.';
+
+  @override
   String get endGameQuestion => 'Terminer la partie ?';
 
   @override
@@ -178,6 +218,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get gameNameHint => 'ex : Uno, Catan, Skyjo…';
+
+  @override
+  String get numberOfRounds => 'Nombre de manches (facultatif)';
+
+  @override
+  String get numberOfRoundsHint => 'ex : 10';
 
   @override
   String get noPlayersRecorded => 'Aucun joueur enregistré';

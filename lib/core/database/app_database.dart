@@ -11,6 +11,7 @@ class Games extends Table {
   BoolColumn get finished => boolean()();
   TextColumn get winnerId => text().nullable()();
   TextColumn get victoryType => text().nullable()();
+  TextColumn get teamsJson => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -22,6 +23,7 @@ class GamePlayers extends Table {
   TextColumn get playerName => text()(); // snapshot du nom au moment de la partie
   IntColumn get position => integer()(); // ordre dans la partie
   TextColumn get scoresJson => text().withDefault(const Constant('[]'))(); // scores du joueur
+  TextColumn get teamId => text().nullable()(); // équipe du joueur (jeu libre)
 
   @override
   Set<Column> get primaryKey => {gameId, position};
@@ -40,13 +42,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, from, to) async {
           if (from < 2) await m.addColumn(games, games.winnerId);
           if (from < 3) await m.addColumn(games, games.victoryType);
+          if (from < 4) {
+            await m.addColumn(games, games.teamsJson);
+            await m.addColumn(gamePlayers, gamePlayers.teamId);
+          }
         },
       );
 

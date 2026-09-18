@@ -89,7 +89,7 @@ final class CurrentGenericGameProvider
 }
 
 String _$currentGenericGameHash() =>
-    r'35dd4bdf2c05e0b8f21af43775c1cbe29c029586';
+    r'1537c95a5d1ef46f83369ff057836d1dd8c1771b';
 
 abstract class _$CurrentGenericGame extends $Notifier<GenericGame?> {
   GenericGame? build();
@@ -327,6 +327,165 @@ abstract class _$GenericSetupVictoryType extends $Notifier<VictoryType> {
             as $ClassProviderElement<
               AnyNotifier<VictoryType, VictoryType>,
               VictoryType,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(GenericSetupRounds)
+final genericSetupRoundsProvider = GenericSetupRoundsProvider._();
+
+final class GenericSetupRoundsProvider
+    extends $NotifierProvider<GenericSetupRounds, int?> {
+  GenericSetupRoundsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'genericSetupRoundsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$genericSetupRoundsHash();
+
+  @$internal
+  @override
+  GenericSetupRounds create() => GenericSetupRounds();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int?>(value),
+    );
+  }
+}
+
+String _$genericSetupRoundsHash() =>
+    r'cabd6125987f5bfae3605634a7a37f03fecdce8e';
+
+abstract class _$GenericSetupRounds extends $Notifier<int?> {
+  int? build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<int?, int?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<int?, int?>,
+              int?,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(GenericSetupTeams)
+final genericSetupTeamsProvider = GenericSetupTeamsProvider._();
+
+final class GenericSetupTeamsProvider
+    extends $NotifierProvider<GenericSetupTeams, List<Team>> {
+  GenericSetupTeamsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'genericSetupTeamsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$genericSetupTeamsHash();
+
+  @$internal
+  @override
+  GenericSetupTeams create() => GenericSetupTeams();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<Team> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<Team>>(value),
+    );
+  }
+}
+
+String _$genericSetupTeamsHash() => r'a009a0b78e21c991c7822670eceacf617fc883f7';
+
+abstract class _$GenericSetupTeams extends $Notifier<List<Team>> {
+  List<Team> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<List<Team>, List<Team>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<Team>, List<Team>>,
+              List<Team>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(GenericSetupPlayerTeams)
+final genericSetupPlayerTeamsProvider = GenericSetupPlayerTeamsProvider._();
+
+final class GenericSetupPlayerTeamsProvider
+    extends $NotifierProvider<GenericSetupPlayerTeams, Map<String, String>> {
+  GenericSetupPlayerTeamsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'genericSetupPlayerTeamsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$genericSetupPlayerTeamsHash();
+
+  @$internal
+  @override
+  GenericSetupPlayerTeams create() => GenericSetupPlayerTeams();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String>>(value),
+    );
+  }
+}
+
+String _$genericSetupPlayerTeamsHash() =>
+    r'd34619b1bc934965deb16f21a3661f601e54ebb5';
+
+abstract class _$GenericSetupPlayerTeams
+    extends $Notifier<Map<String, String>> {
+  Map<String, String> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<Map<String, String>, Map<String, String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<Map<String, String>, Map<String, String>>,
+              Map<String, String>,
               Object?,
               Object?
             >;

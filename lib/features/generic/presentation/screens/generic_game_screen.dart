@@ -53,6 +53,161 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
     super.dispose();
   }
 
+  Widget _buildRightZone(BuildContext context, dynamic game, double colW, int rounds, bool writable, dynamic notifier) {
+    if (game.hasTeams as bool) {
+      return _buildTeamZone(context, game, colW, rounds, writable, notifier);
+    }
+    final players = game.players as List;
+    final totalWidth = colW * players.length;
+    return SizedBox(
+      width: totalWidth,
+      child: Column(
+        children: [
+          Row(
+            children: players.map<Widget>((p) => _HeaderCell(
+              label: p.name as String,
+              width: colW,
+              height: _rowHeight,
+              isWinner: (game.winnerIds as List).contains(p.id),
+            )).toList(),
+          ),
+          Expanded(
+            child: ListView.builder(
+              controller: _rightScroll,
+              itemCount: rounds + 1,
+              itemBuilder: (_, i) {
+                if (i < rounds) {
+                  return Row(
+                    children: players.map<Widget>((p) {
+                      final isWinner = (game.winnerIds as List).contains(p.id);
+                      return _ScoreInput(
+                        key: ValueKey('${p.id}-$i'),
+                        value: (game.scores as Map)[p.id]?[i] as int?,
+                        width: colW,
+                        enabled: writable,
+                        bgColor: isWinner ? _colorWinner : _colorBackground,
+                        onChanged: (v) => notifier.setScore(p.id as String, i, v),
+                      );
+                    }).toList(),
+                  );
+                }
+                return Row(
+                  children: players.map<Widget>((p) {
+                    final total = game.playerTotal(p.id as String) as int?;
+                    final isWinner = (game.winnerIds as List).contains(p.id);
+                    return _Cell(
+                      label: total?.toString() ?? '—',
+                      width: colW,
+                      textColor: isWinner ? const Color(0xFFDAA520) : _colorTotal,
+                      bold: true,
+                      bgColor: isWinner ? _colorWinner : null,
+                      accentBorder: isWinner,
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTeamZone(BuildContext context, dynamic game, double colW, int rounds, bool writable, dynamic notifier) {
+    final teams = game.teams as List;
+    final orderedPlayers = teams.expand<dynamic>((t) => game.playersForTeam(t.id as String) as List).toList();
+    final totalWidth = colW * orderedPlayers.length;
+
+    List<Widget> buildScoreRow(int i) => teams.expand<Widget>((team) {
+      final teamPlayers = game.playersForTeam(team.id as String) as List;
+      return teamPlayers.map((p) {
+        final isWinner = (game.winnerIds as List).contains(p.id);
+        return _ScoreInput(
+          key: ValueKey('${p.id}-$i'),
+          value: (game.scores as Map)[p.id]?[i] as int?,
+          width: colW,
+          enabled: writable,
+          bgColor: isWinner ? _colorWinner : _colorBackground,
+          onChanged: (v) => notifier.setScore(p.id as String, i, v),
+        );
+      });
+    }).toList();
+
+    List<Widget> buildPlayerTotalRow() => teams.expand<Widget>((team) {
+      final teamPlayers = game.playersForTeam(team.id as String) as List;
+      return teamPlayers.map((p) {
+        final total = game.playerTotal(p.id as String) as int?;
+        final isWinner = (game.winnerIds as List).contains(p.id);
+        return _Cell(
+          label: total?.toString() ?? '—',
+          width: colW,
+          textColor: isWinner ? const Color(0xFFDAA520) : _colorTotal,
+          bold: true,
+          bgColor: isWinner ? _colorWinner : null,
+          accentBorder: isWinner,
+        );
+      });
+    }).toList();
+
+    List<Widget> buildTeamTotalRow() => teams.map<Widget>((team) {
+      final teamPlayers = game.playersForTeam(team.id as String) as List;
+      final isTeamWinner = teamPlayers.any((p) => (game.winnerIds as List).contains(p.id));
+      final teamTot = game.teamTotal(team.id as String) as int?;
+      return _Cell(
+        label: teamTot?.toString() ?? '—',
+        width: colW * teamPlayers.length,
+        textColor: isTeamWinner ? const Color(0xFFDAA520) : _colorTotal,
+        bold: true,
+        bgColor: isTeamWinner ? _colorWinner : _colorHeader,
+        accentBorder: isTeamWinner,
+      );
+    }).toList();
+
+    return SizedBox(
+      width: totalWidth,
+      child: Column(
+        children: [
+          // En-tête équipes
+          Row(
+            children: teams.map<Widget>((t) {
+              final teamPlayers = game.playersForTeam(t.id as String) as List;
+              final isTeamWinner = teamPlayers.any((p) => (game.winnerIds as List).contains(p.id));
+              return _TeamHeaderCell(
+                label: t.name as String,
+                width: colW * teamPlayers.length,
+                isWinner: isTeamWinner,
+              );
+            }).toList(),
+          ),
+          // En-tête joueurs
+          Row(
+            children: teams.expand<Widget>((t) {
+              final teamPlayers = game.playersForTeam(t.id as String) as List;
+              return teamPlayers.map((p) => _HeaderCell(
+                label: p.name as String,
+                width: colW,
+                height: _rowHeight * 0.75,
+                isWinner: (game.winnerIds as List).contains(p.id),
+              ));
+            }).toList(),
+          ),
+          // Lignes scores + totaux joueurs + totaux équipes
+          Expanded(
+            child: ListView.builder(
+              controller: _rightScroll,
+              itemCount: rounds + 2,
+              itemBuilder: (_, i) {
+                if (i < rounds) return Row(children: buildScoreRow(i));
+                if (i == rounds) return Row(children: buildPlayerTotalRow());
+                return Row(children: buildTeamTotalRow());
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final game = ref.watch(currentGenericGameProvider);
@@ -77,6 +232,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                     ((constraints.maxWidth - _colFixedWidth) / players.length)
                         .clamp(_colPlayerMinWidth, double.infinity);
 
+                final hasTeams = game.hasTeams as bool;
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -85,23 +241,34 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                       width: _colFixedWidth,
                       child: Column(
                         children: [
-                          _HeaderCell(label: AppLocalizations.of(context).roundAbbrev, width: _colFixedWidth, height: _rowHeight),
+                          _HeaderCell(
+                            label: AppLocalizations.of(context).roundAbbrev,
+                            width: _colFixedWidth,
+                            height: hasTeams ? _rowHeight * 1.35 : _rowHeight,
+                          ),
                           Expanded(
                             child: ListView.builder(
                               controller: _leftScroll,
-                              itemCount: rounds + 1,
+                              itemCount: rounds + (hasTeams ? 2 : 1),
                               itemBuilder: (_, i) {
                                 if (i < rounds) {
+                                  return _Cell(label: '${i + 1}', width: _colFixedWidth);
+                                }
+                                if (i == rounds) {
                                   return _Cell(
-                                    label: '${i + 1}',
+                                    label: AppLocalizations.of(context).totalLabel,
                                     width: _colFixedWidth,
+                                    textColor: _colorTotal,
+                                    bold: true,
                                   );
                                 }
                                 return _Cell(
-                                  label: AppLocalizations.of(context).totalLabel,
+                                  label: AppLocalizations.of(context).teamTotal,
                                   width: _colFixedWidth,
                                   textColor: _colorTotal,
                                   bold: true,
+                                  bgColor: _colorHeader,
+                                  softWrap: true,
                                 );
                               },
                             ),
@@ -113,63 +280,7 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
                     Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child: SizedBox(
-                          width: colPlayerWidth * players.length,
-                          child: Column(
-                            children: [
-                              // En-tête joueurs
-                              Row(
-                                children: players
-                                    .map((p) => _HeaderCell(
-                                          label: p.name,
-                                          width: colPlayerWidth,
-                                          height: _rowHeight,
-                                          isWinner: game.winnerIds.contains(p.id),
-                                        ))
-                                    .toList(),
-                              ),
-                              // Lignes de scores
-                              Expanded(
-                                child: ListView.builder(
-                                  controller: _rightScroll,
-                                  itemCount: rounds + 1,
-                                  itemBuilder: (_, i) {
-                                    if (i < rounds) {
-                                      return Row(
-                                        children: players.map((p) {
-                                          final isWinner = game.winnerIds.contains(p.id);
-                                          return _ScoreInput(
-                                            key: ValueKey('${p.id}-$i'),
-                                            value: game.scores[p.id]?[i],
-                                            width: colPlayerWidth,
-                                            enabled: writable,
-                                            bgColor: isWinner ? _colorWinner : _colorBackground,
-                                            onChanged: (v) => notifier.setScore(p.id, i, v),
-                                          );
-                                        }).toList(),
-                                      );
-                                    }
-                                    // Ligne total
-                                    return Row(
-                                      children: players.map((p) {
-                                        final total = game.playerTotal(p.id);
-                                        final isWinner = game.winnerIds.contains(p.id);
-                                        return _Cell(
-                                          label: total?.toString() ?? '—',
-                                          width: colPlayerWidth,
-                                          textColor: isWinner ? const Color(0xFFDAA520) : _colorTotal,
-                                          bold: true,
-                                          bgColor: isWinner ? _colorWinner : null,
-                                          accentBorder: isWinner,
-                                        );
-                                      }).toList(),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        child: _buildRightZone(context, game, colPlayerWidth, rounds, writable, notifier),
                       ),
                     ),
                   ],
@@ -184,15 +295,40 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                if (writable)
+                if (writable) ...[
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: notifier.addRound,
-                      icon: const Icon(Icons.add),
-                      label: Text(AppLocalizations.of(context).roundLabel),
+                    child: _RoundStepper(
+                      label: AppLocalizations.of(context).roundLabel,
+                      canRemove: rounds > 0,
+                      onAdd: notifier.addRound,
+                      onRemove: () async {
+                        if (notifier.lastRoundHasScores) {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) {
+                              final ll = AppLocalizations.of(ctx);
+                              return AlertDialog(
+                                title: Text(ll.deleteRoundQuestion),
+                                content: Text(ll.deleteRoundWarning),
+                                actions: [
+                                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(ll.cancel)),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                    child: Text(ll.delete),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (confirmed != true) return;
+                        }
+                        notifier.removeLastRound();
+                      },
                     ),
                   ),
-                if (writable) const SizedBox(width: 12),
+                  const SizedBox(width: 12),
+                ],
                 Expanded(
                   child: FilledButton(
                     style: FilledButton.styleFrom(
@@ -231,6 +367,123 @@ class _GenericGameScreenState extends ConsumerState<GenericGameScreen> {
           ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Team header cell ──────────────────────────────────────────────────────────
+
+class _TeamHeaderCell extends StatelessWidget {
+  final String label;
+  final double width;
+  final bool isWinner;
+
+  const _TeamHeaderCell({required this.label, required this.width, this.isWinner = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: _rowHeight * 0.6,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isWinner ? _colorWinner : _colorHeader,
+        border: isWinner
+            ? const Border(
+                top: BorderSide(color: Color(0xFFDAA520), width: 2),
+                left: BorderSide(color: Color(0xFFDAA520), width: 2),
+                right: BorderSide(color: Color(0xFFDAA520), width: 2),
+                bottom: BorderSide(color: _colorBorder, width: 0.5),
+              )
+            : Border.all(color: _colorBorder, width: 0.5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isWinner) const Icon(Icons.emoji_events, size: 13, color: Color(0xFFDAA520)),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+              color: isWinner ? const Color(0xFFDAA520) : null,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Round stepper ─────────────────────────────────────────────────────────────
+
+class _RoundStepper extends StatelessWidget {
+  final String label;
+  final bool canRemove;
+  final VoidCallback onAdd;
+  final VoidCallback onRemove;
+
+  const _RoundStepper({
+    required this.label,
+    required this.canRemove,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final outline = Theme.of(context).colorScheme.outline;
+    final borderRadius = BorderRadius.circular(100);
+    return SizedBox(
+      height: 40,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: outline),
+          borderRadius: borderRadius,
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Row(
+            children: [
+              _StepperButton(icon: Icons.remove, enabled: canRemove, onTap: onRemove, color: primary),
+              VerticalDivider(width: 1, thickness: 1, color: outline),
+              Expanded(
+                child: Center(
+                  child: Text(label, style: TextStyle(fontSize: 14, color: primary)),
+                ),
+              ),
+              VerticalDivider(width: 1, thickness: 1, color: outline),
+              _StepperButton(icon: Icons.add, enabled: true, onTap: onAdd, color: primary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+  final Color color;
+
+  const _StepperButton({required this.icon, required this.enabled, required this.onTap, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      child: SizedBox(
+        width: 40,
+        child: Icon(
+          icon,
+          size: 18,
+          color: enabled ? color : Theme.of(context).disabledColor,
+        ),
       ),
     );
   }
@@ -294,6 +547,7 @@ class _Cell extends StatelessWidget {
   final Color? bgColor;
   final bool bold;
   final bool accentBorder;
+  final bool softWrap;
 
   const _Cell({
     required this.label,
@@ -302,6 +556,7 @@ class _Cell extends StatelessWidget {
     this.bgColor,
     this.bold = false,
     this.accentBorder = false,
+    this.softWrap = false,
   });
 
   @override
@@ -323,9 +578,13 @@ class _Cell extends StatelessWidget {
       ),
       child: Text(
         label,
+        textAlign: TextAlign.center,
+        softWrap: softWrap,
+        overflow: softWrap ? TextOverflow.visible : TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
           fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+          fontSize: softWrap ? 11 : null,
         ),
       ),
     );

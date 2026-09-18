@@ -200,6 +200,72 @@ abstract class AppLocalizations {
   /// **'Rename'**
   String get rename;
 
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @teams.
+  ///
+  /// In en, this message translates to:
+  /// **'Teams'**
+  String get teams;
+
+  /// No description provided for @team.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get team;
+
+  /// No description provided for @teamTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Team total'**
+  String get teamTotal;
+
+  /// No description provided for @addTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a team'**
+  String get addTeam;
+
+  /// No description provided for @assignPlayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Players to assign'**
+  String get assignPlayers;
+
+  /// No description provided for @removeFromTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop here to remove from team'**
+  String get removeFromTeam;
+
+  /// No description provided for @removeTeams.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove teams'**
+  String get removeTeams;
+
+  /// No description provided for @teamsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get teamsOff;
+
+  /// No description provided for @teamsIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete'**
+  String get teamsIncomplete;
+
+  /// No description provided for @chooseTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a team'**
+  String get chooseTeam;
+
   /// No description provided for @merge.
   ///
   /// In en, this message translates to:
@@ -338,6 +404,18 @@ abstract class AppLocalizations {
   /// **'Round'**
   String get roundLabel;
 
+  /// No description provided for @deleteRoundQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the last round?'**
+  String get deleteRoundQuestion;
+
+  /// No description provided for @deleteRoundWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This round contains scores that will be permanently deleted.'**
+  String get deleteRoundWarning;
+
   /// No description provided for @endGameQuestion.
   ///
   /// In en, this message translates to:
@@ -385,6 +463,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g. Uno, Catan, Skyjo…'**
   String get gameNameHint;
+
+  /// No description provided for @numberOfRounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of rounds (optional)'**
+  String get numberOfRounds;
+
+  /// No description provided for @numberOfRoundsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 10'**
+  String get numberOfRoundsHint;
 
   /// No description provided for @noPlayersRecorded.
   ///

@@ -62,6 +62,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rename => 'Rename';
 
   @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get teams => 'Teams';
+
+  @override
+  String get team => 'Team';
+
+  @override
+  String get teamTotal => 'Team total';
+
+  @override
+  String get addTeam => 'Add a team';
+
+  @override
+  String get assignPlayers => 'Players to assign';
+
+  @override
+  String get removeFromTeam => 'Drop here to remove from team';
+
+  @override
+  String get removeTeams => 'Remove teams';
+
+  @override
+  String get teamsOff => 'Inactive';
+
+  @override
+  String get teamsIncomplete => 'Incomplete';
+
+  @override
+  String get chooseTeam => 'Choose a team';
+
+  @override
   String get merge => 'Merge';
 
   @override
@@ -154,6 +187,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roundLabel => 'Round';
 
   @override
+  String get deleteRoundQuestion => 'Delete the last round?';
+
+  @override
+  String get deleteRoundWarning =>
+      'This round contains scores that will be permanently deleted.';
+
+  @override
   String get endGameQuestion => 'End game?';
 
   @override
@@ -178,6 +218,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameNameHint => 'e.g. Uno, Catan, Skyjo…';
+
+  @override
+  String get numberOfRounds => 'Number of rounds (optional)';
+
+  @override
+  String get numberOfRoundsHint => 'e.g. 10';
 
   @override
   String get noPlayersRecorded => 'No players recorded';

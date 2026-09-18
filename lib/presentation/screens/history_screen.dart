@@ -122,11 +122,13 @@ class _Entry {
     final dateStr = _fmt(date);
     final finished = game.finished as bool;
     final playerCount = (game.players as List).length;
+    final teamCount = (game.teams as List).length;
+    final teamsInfo = teamCount > 0 ? ' · $teamCount ${l.teams.toLowerCase()}' : '';
     final winnerLine = finished ? _buildWinnerLine(game) : null;
     return _Entry(
       id: game.id as String,
       title: '${game.name as String} (${l.freeGame})',
-      subtitle: '$dateStr · ${l.playersCount(playerCount)}${finished ? '' : l.inProgress}',
+      subtitle: '$dateStr · ${l.playersCount(playerCount)}$teamsInfo${finished ? '' : l.inProgress}',
       finished: finished,
       createdAt: game.createdAt as DateTime,
       gameType: 'generic',
@@ -138,6 +140,31 @@ class _Entry {
     final winnerIds = game.winnerIds as List<String>;
     if (winnerIds.isEmpty) return null;
     final players = game.players as List;
+    List? teams;
+    try { teams = game.teams as List; } catch (_) {}
+
+    if (teams != null && teams.isNotEmpty) {
+      // Regrouper les vainqueurs par équipe
+      final winningTeams = <dynamic>{};
+      for (final id in winnerIds) {
+        final teamId = (game.playerTeams as Map)[id] as String?;
+        if (teamId == null) continue;
+        final team = teams.where((t) => t.id == teamId).firstOrNull;
+        if (team != null) winningTeams.add(team);
+      }
+      if (winningTeams.isEmpty) return null;
+      int? sharedTotal;
+      final parts = winningTeams.map((t) {
+        final members = game.playersForTeam(t.id as String) as List;
+        final memberNames = members.map((p) => p.name as String).join(', ');
+        sharedTotal ??= game.teamTotal(t.id as String) as int?;
+        return '${t.name as String} ($memberNames)';
+      }).toList();
+      final score = sharedTotal != null ? ' — $sharedTotal ${sharedTotal!.abs() > 1 ? 'pts' : 'pt'}' : '';
+      return '🏆 ${parts.join(', ')}$score';
+    }
+
+    // Sans équipes
     final names = <String>[];
     int? sharedTotal;
     for (final id in winnerIds) {
@@ -147,7 +174,7 @@ class _Entry {
       sharedTotal ??= game.playerTotal(id) as int?;
     }
     if (names.isEmpty) return null;
-    final score = sharedTotal != null ? ' ($sharedTotal ${sharedTotal!.abs() > 1 ? 'pts' : 'pt'})' : '';
+    final score = sharedTotal != null ? ' — $sharedTotal ${sharedTotal!.abs() > 1 ? 'pts' : 'pt'}' : '';
     return '🏆 ${names.join(', ')}$score';
   }
 

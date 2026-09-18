@@ -18,7 +18,7 @@ class CurrentGenericGame extends _$CurrentGenericGame {
   @override
   GenericGame? build() => null;
 
-  Future<void> newGame(String name, List<Player> players, VictoryType victoryType) async {
+  Future<void> newGame(String name, List<Player> players, VictoryType victoryType, {int rounds = 1, List<Team> teams = const [], Map<String, String> playerTeams = const {}}) async {
     final savedRepo = ref.read(savedPlayersRepositoryProvider);
     final trimmed = players.map((p) => p.copyWith(name: p.name.trim())).toList();
 
@@ -37,14 +37,24 @@ class CurrentGenericGame extends _$CurrentGenericGame {
       }
     }
 
+    // Remap playerTeams ids (peut changer après résolution carnet)
+    final remappedPlayerTeams = <String, String>{};
+    for (final entry in playerTeams.entries) {
+      final original = players.firstWhere((p) => p.id == entry.key, orElse: () => Player(id: entry.key, name: ''));
+      final resolvedPlayer = resolved.where((p) => p.name.toLowerCase() == original.name.toLowerCase()).firstOrNull;
+      if (resolvedPlayer != null) remappedPlayerTeams[resolvedPlayer.id] = entry.value;
+    }
+
     final game = GenericGame(
       id: const Uuid().v4(),
       name: name,
       createdAt: DateTime.now(),
       players: resolved,
-      scores: {for (final p in resolved) p.id: []},
+      scores: {for (final p in resolved) p.id: List<int?>.filled(rounds, null)},
       finished: false,
       victoryType: victoryType,
+      teams: teams,
+      playerTeams: remappedPlayerTeams,
     );
     await ref.read(genericRepositoryProvider).saveGame(game);
     state = game;
@@ -59,6 +69,21 @@ class CurrentGenericGame extends _$CurrentGenericGame {
     final game = state;
     if (game == null || game.finished) return;
     final newScores = game.scores.map((k, v) => MapEntry(k, [...v, null]));
+    state = game.copyWith(scores: newScores);
+    _autosave();
+  }
+
+  bool get lastRoundHasScores {
+    final game = state;
+    if (game == null || game.numberOfRounds == 0) return false;
+    final last = game.numberOfRounds - 1;
+    return game.scores.values.any((v) => v.length > last && v[last] != null);
+  }
+
+  void removeLastRound() {
+    final game = state;
+    if (game == null || game.finished || game.numberOfRounds == 0) return;
+    final newScores = game.scores.map((k, v) => MapEntry(k, v.sublist(0, v.length - 1)));
     state = game.copyWith(scores: newScores);
     _autosave();
   }
@@ -121,6 +146,30 @@ class GenericSetupVictoryType extends _$GenericSetupVictoryType {
   VictoryType build() => VictoryType.highestScore;
 
   void set(VictoryType type) => state = type;
+}
+
+@riverpod
+class GenericSetupRounds extends _$GenericSetupRounds {
+  @override
+  int? build() => null;
+
+  void set(int? rounds) => state = rounds;
+}
+
+@riverpod
+class GenericSetupTeams extends _$GenericSetupTeams {
+  @override
+  List<Team> build() => [];
+
+  void set(List<Team> teams) => state = teams;
+}
+
+@riverpod
+class GenericSetupPlayerTeams extends _$GenericSetupPlayerTeams {
+  @override
+  Map<String, String> build() => {};
+
+  void set(Map<String, String> playerTeams) => state = playerTeams;
 }
 
 @riverpod

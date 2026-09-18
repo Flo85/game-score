@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../presentation/widgets/start_fab.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
 import '../../../../presentation/screens/history_screen.dart';
@@ -36,17 +37,6 @@ class SetupScreen extends ConsumerWidget {
               context,
               MaterialPageRoute(builder: (_) => const HistoryScreen(initialFilter: GameFilter.faraway)),
             ),
-          ),
-          TextButton(
-            onPressed: players.length < 2 || players.any((p) => p.name.trim().isEmpty)
-                ? null
-                : () async {
-                    await ref.read(currentGameProvider.notifier).newGame(players);
-                    if (context.mounted) {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
-                    }
-                  },
-            child: Text(l.start),
           ),
         ],
       ),
@@ -108,12 +98,29 @@ class SetupScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: isMaxReached
-          ? null
-          : FloatingActionButton(
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (!isMaxReached) ...[
+            FloatingActionButton(
+              heroTag: 'addPlayer',
               onPressed: notifier.add,
               child: const Icon(Icons.add),
             ),
+            const SizedBox(width: 12),
+          ],
+          StartFab(
+            active: players.length >= 2 && players.every((p) => p.name.trim().isNotEmpty),
+            label: l.start,
+            onPressed: () async {
+              await ref.read(currentGameProvider.notifier).newGame(players);
+              if (context.mounted) {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const GameScreen()));
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
