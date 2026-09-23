@@ -613,24 +613,28 @@ class _TeamsDialogState extends State<_TeamsDialog> {
         ),
       ),
       actions: [
-        if (widget.initialTeams.isNotEmpty)
-          TextButton(
-            onPressed: () => Navigator.pop(context, (teams: <Team>[], playerTeams: <String, String>{})),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(l.removeTeams),
-          ),
-        const Spacer(),
-        TextButton(
-          onPressed: () => Navigator.pop(context, null),
-          child: Text(l.cancel),
-        ),
-        TextButton(
-          onPressed: !_allAssigned ? null : () {
-            final usedTeamIds = _playerTeams.values.toSet();
-            final activeTeams = _teams.where((t) => usedTeamIds.contains(t.id)).toList();
-            Navigator.pop(context, (teams: activeTeams, playerTeams: _playerTeams));
-          },
-          child: Text(l.confirm),
+        Row(
+          children: [
+            if (widget.initialTeams.isNotEmpty)
+              TextButton(
+                onPressed: () => Navigator.pop(context, (teams: <Team>[], playerTeams: <String, String>{})),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(l.removeTeams),
+              ),
+            const Spacer(),
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: !_allAssigned ? null : () {
+                final usedTeamIds = _playerTeams.values.toSet();
+                final activeTeams = _teams.where((t) => usedTeamIds.contains(t.id)).toList();
+                Navigator.pop(context, (teams: activeTeams, playerTeams: _playerTeams));
+              },
+              child: Text(l.confirm),
+            ),
+          ],
         ),
       ],
     );
