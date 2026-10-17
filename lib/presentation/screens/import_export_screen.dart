@@ -53,7 +53,7 @@ class ImportExportScreen extends ConsumerWidget {
       final json = jsonEncode(all);
       final timestamp = DateTime.now().toIso8601String().substring(0, 19).replaceAll(':', '-');
       final bytes = utf8.encode(json);
-      final path = await FilePicker.platform.saveFile(
+      final path = await FilePicker.saveFile(
         fileName: 'gamescore-$timestamp.json',
         bytes: bytes,
       );
@@ -67,14 +67,14 @@ class ImportExportScreen extends ConsumerWidget {
 
   Future<void> _importAll(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context);
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
-    if (result == null || result.files.single.path == null) return;
+    if (file == null || file.path == null) return;
     if (!context.mounted) return;
     try {
-      final raw = jsonDecode(await File(result.files.single.path!).readAsString()) as List;
+      final raw = jsonDecode(await File(file.path!).readAsString()) as List;
       final farawayJson = raw.where((g) => (g as Map)['gameType'] == 'faraway').cast<Map<String, dynamic>>().toList();
       final genericJson = raw.where((g) => (g as Map)['gameType'] == 'generic').cast<Map<String, dynamic>>().toList();
 
