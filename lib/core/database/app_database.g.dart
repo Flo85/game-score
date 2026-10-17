@@ -1472,8 +1472,10 @@ class $$GamesTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) =>
-                    (e.readTable(table), $$GamesTableReferences(db, table, e)),
+                (e) => (
+                  e.readTable<$GamesTable, Game>(table),
+                  $$GamesTableReferences(db, table, e),
+                ),
               )
               .toList(),
           prefetchHooksCallback: ({gamePlayersRefs = false}) {
@@ -1792,7 +1794,7 @@ class $$GamePlayersTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$GamePlayersTable, GamePlayer>(table),
                   $$GamePlayersTableReferences(db, table, e),
                 ),
               )
@@ -1971,7 +1973,16 @@ class $$SavedPlayersTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$SavedPlayersTable, SavedPlayer>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $SavedPlayersTable,
+                    SavedPlayer
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
