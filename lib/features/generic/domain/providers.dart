@@ -5,7 +5,7 @@ import '../../../features/faraway/domain/providers.dart' show appDatabaseProvide
 import '../data/generic_repository.dart';
 import 'models.dart';
 
-export '../../../features/faraway/domain/providers.dart' show savedPlayersListProvider, savedPlayersRepositoryProvider, farawayPlayerStatsProvider;
+export '../../../features/faraway/domain/providers.dart' show savedPlayersListProvider, savedPlayersRepositoryProvider, farawayPlayerStatsProvider, playerGameCountsProvider;
 
 part 'providers.g.dart';
 
@@ -175,14 +175,16 @@ class GenericSetupPlayerTeams extends _$GenericSetupPlayerTeams {
 @riverpod
 class GenericSetupPlayers extends _$GenericSetupPlayers {
   @override
-  List<Player> build() => [Player.create(''), Player.create('')];
+  List<Player> build() => [];
 
-  void add() => state = [...state, Player.create('')];
+  void addPlayer(Player player) => state = [...state, player];
+
+  void removeByName(String name) {
+    final key = name.trim().toLowerCase();
+    state = state.where((p) => p.name.trim().toLowerCase() != key).toList();
+  }
 
   void remove(String id) => state = state.where((p) => p.id != id).toList();
-
-  void rename(String id, String name) =>
-      state = state.map((p) => p.id == id ? p.copyWith(name: name) : p).toList();
 
   void reorder(int from, int to) {
     final list = [...state];

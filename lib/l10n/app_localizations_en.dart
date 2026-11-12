@@ -206,7 +206,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endGameAction => 'End';
 
   @override
-  String get maxPlayers => 'Maximum 7 players';
+  String playersCounter(int count, int max) {
+    return '$count/$max players maximum';
+  }
+
+  @override
+  String get addAtLeastOnePlayer => 'Add at least one player';
 
   @override
   String playerIndex(int index) {
@@ -241,6 +246,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerNameHint => 'Player name';
+
+  @override
+  String get frequentPlayers => 'Frequent players';
+
+  @override
+  String get searchPlayer => 'Search or create a player';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String createPlayerNamed(String name) {
+    return 'Create \"$name\"';
+  }
 
   @override
   String gamesCount(int count) {

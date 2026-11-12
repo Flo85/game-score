@@ -440,11 +440,17 @@ abstract class AppLocalizations {
   /// **'End'**
   String get endGameAction;
 
-  /// No description provided for @maxPlayers.
+  /// No description provided for @playersCounter.
   ///
   /// In en, this message translates to:
-  /// **'Maximum 7 players'**
-  String get maxPlayers;
+  /// **'{count}/{max} players maximum'**
+  String playersCounter(int count, int max);
+
+  /// No description provided for @addAtLeastOnePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one player'**
+  String get addAtLeastOnePlayer;
 
   /// No description provided for @playerIndex.
   ///
@@ -505,6 +511,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Player name'**
   String get playerNameHint;
+
+  /// No description provided for @frequentPlayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent players'**
+  String get frequentPlayers;
+
+  /// No description provided for @searchPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Search or create a player'**
+  String get searchPlayer;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @createPlayerNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Create \"{name}\"'**
+  String createPlayerNamed(String name);
 
   /// No description provided for @gamesCount.
   ///

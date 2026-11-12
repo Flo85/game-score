@@ -27,6 +27,10 @@ SavedPlayersRepository savedPlayersRepository(Ref ref) =>
 Stream<List<Player>> savedPlayersList(Ref ref) =>
     ref.watch(savedPlayersRepositoryProvider).watchAll();
 
+@riverpod
+Stream<Map<String, int>> playerGameCounts(Ref ref, String gameType) =>
+    ref.watch(appDatabaseProvider).watchPlayerGameCounts(gameType);
+
 // ── Historique (stream réactif) ────────────────────────────────────────────────
 
 @riverpod
@@ -158,21 +162,19 @@ class CurrentGame extends _$CurrentGame {
 @riverpod
 class SetupPlayers extends _$SetupPlayers {
   @override
-  List<Player> build() => [
-        Player.create(''),
-        Player.create(''),
-      ];
+  List<Player> build() => [];
 
-  void add() {
+  void addPlayer(Player player) {
     if (state.length >= 7) return;
-    state = [...state, Player.create('')];
+    state = [...state, player];
+  }
+
+  void removeByName(String name) {
+    final key = name.trim().toLowerCase();
+    state = state.where((p) => p.name.trim().toLowerCase() != key).toList();
   }
 
   void remove(String id) => state = state.where((p) => p.id != id).toList();
-
-  void rename(String id, String name) {
-    state = state.map((p) => p.id == id ? p.copyWith(name: name) : p).toList();
-  }
 
   void reorder(int from, int to) {
     final list = [...state];

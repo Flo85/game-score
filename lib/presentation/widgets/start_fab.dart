@@ -5,7 +5,12 @@ class StartFab extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const StartFab({super.key, required this.active, required this.label, required this.onPressed});
+  const StartFab({
+    super.key,
+    required this.active,
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,11 @@ class StartFab extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withAlpha(60), blurRadius: 6, offset: const Offset(0, 3)),
+          BoxShadow(
+            color: Colors.black.withAlpha(60),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: Material(
@@ -41,10 +50,20 @@ class StartFab extends StatelessWidget {
                     duration: const Duration(milliseconds: 280),
                     curve: Curves.easeInOut,
                     child: active
-                        ? Row(mainAxisSize: MainAxisSize.min, children: [
-                            const SizedBox(width: 8),
-                            Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
-                          ])
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(width: 8),
+                              Text(
+                                label,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          )
                         : const SizedBox.shrink(),
                   ),
                 ),

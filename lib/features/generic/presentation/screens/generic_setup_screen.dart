@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../features/faraway/presentation/screens/saved_players_screen.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../presentation/widgets/player_picker.dart';
+import '../../../../presentation/widgets/setup_player_list.dart';
 import '../../../../presentation/widgets/start_fab.dart';
 import '../../domain/models.dart';
 import '../../domain/providers.dart';
@@ -18,7 +20,6 @@ class GenericSetupScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final players = ref.watch(genericSetupPlayersProvider);
     final notifier = ref.read(genericSetupPlayersProvider.notifier);
-    final savedPlayers = ref.watch(savedPlayersListProvider).asData?.value ?? [];
     final gameName = ref.watch(genericSetupNameProvider);
     final victoryType = ref.watch(genericSetupVictoryTypeProvider);
     final setupRounds = ref.watch(genericSetupRoundsProvider);
@@ -31,9 +32,8 @@ class GenericSetupScreen extends ConsumerWidget {
     final setupPlayerTeams = ref.watch(genericSetupPlayerTeamsProvider);
     final teamsConfigured = setupTeams.isNotEmpty &&
         players.every((p) => setupPlayerTeams.containsKey(p.id));
-    final canStart = players.length >= 2 &&
+    final canStart = players.isNotEmpty &&
         gameName.trim().isNotEmpty &&
-        players.every((p) => p.name.trim().isNotEmpty) &&
         (setupTeams.isEmpty || teamsConfigured);
 
     return Scaffold(
@@ -138,40 +138,17 @@ class GenericSetupScreen extends ConsumerWidget {
               },
             ),
           ),
+          PlayerQuickPicker(
+            gameType: 'generic',
+            playersProvider: genericSetupPlayersProvider,
+            onAdd: notifier.addPlayer,
+            onRemove: notifier.removeByName,
+          ),
           Expanded(
-            child: ReorderableListView.builder(
-              itemCount: players.length,
-              onReorderItem: notifier.reorder,
-              buildDefaultDragHandles: false,
-              padding: const EdgeInsets.only(bottom: 160),
-              itemBuilder: (context, i) {
-                final player = players[i];
-                return ListTile(
-                  key: ValueKey(player.id),
-                  title: _PlayerNameField(
-                    player: player,
-                    index: i,
-                    savedPlayers: savedPlayers,
-                    currentPlayers: players,
-                    onChanged: (name) => notifier.rename(player.id, name),
-                    onSavedPlayerSelected: (saved) => notifier.rename(player.id, saved.name),
-                    autofocus: i == players.length - 1 && player.name.isEmpty && i > 1,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => notifier.remove(player.id),
-                      ),
-                      ReorderableDragStartListener(
-                        index: i,
-                        child: const Icon(Icons.drag_handle),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            child: SetupPlayerList(
+              players: players,
+              onReorder: notifier.reorder,
+              onRemove: notifier.remove,
             ),
           ),
         ],
@@ -181,7 +158,13 @@ class GenericSetupScreen extends ConsumerWidget {
         children: [
           FloatingActionButton(
             heroTag: 'addPlayer',
-            onPressed: notifier.add,
+            onPressed: () => showPlayerPickerSheet(
+              context,
+              gameType: 'generic',
+              playersProvider: genericSetupPlayersProvider,
+              onAdd: notifier.addPlayer,
+              onRemove: notifier.removeByName,
+            ),
             child: const Icon(Icons.add),
           ),
           const SizedBox(width: 12),
@@ -205,110 +188,6 @@ class GenericSetupScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// ── Champ nom avec autocomplete (identique au setup Faraway) ──────────────────
-
-class _PlayerNameField extends StatefulWidget {
-  final Player player;
-  final int index;
-  final List<Player> savedPlayers;
-  final List<Player> currentPlayers;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<Player> onSavedPlayerSelected;
-  final bool autofocus;
-
-  const _PlayerNameField({
-    required this.player,
-    required this.index,
-    required this.savedPlayers,
-    required this.currentPlayers,
-    required this.onChanged,
-    required this.onSavedPlayerSelected,
-    this.autofocus = false,
-  });
-
-  @override
-  State<_PlayerNameField> createState() => _PlayerNameFieldState();
-}
-
-class _PlayerNameFieldState extends State<_PlayerNameField> {
-  bool _initialized = false;
-  FocusNode? _focusNode;
-  TextEditingController? _controller;
-  void _onFocusChange(BuildContext fieldContext) {
-    final focusNode = _focusNode!;
-    final controller = _controller!;
-    if (focusNode.hasFocus) {
-      controller.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: controller.text.length,
-      );
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!fieldContext.mounted) return;
-        Scrollable.ensureVisible(
-          fieldContext,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
-        );
-      });
-    } else {
-      final trimmed = controller.text.trim();
-      if (trimmed != controller.text) {
-        controller.text = trimmed;
-        widget.onChanged(trimmed);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _focusNode?.removeListener(() {});
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final takenNames = widget.currentPlayers
-        .where((p) => p.id != widget.player.id)
-        .map((p) => p.name.toLowerCase())
-        .toSet();
-
-    return Autocomplete<Player>(
-      displayStringForOption: (p) => p.name,
-      optionsBuilder: (value) {
-        final query = value.text.toLowerCase();
-        if (query.isEmpty) return [];
-        return widget.savedPlayers.where(
-          (p) =>
-              p.name.toLowerCase().startsWith(query) &&
-              !takenNames.contains(p.name.toLowerCase()),
-        );
-      },
-      onSelected: widget.onSavedPlayerSelected,
-      fieldViewBuilder: (context, controller, focusNode, _) {
-        if (!_initialized) {
-          _initialized = true;
-          _controller = controller;
-          _focusNode = focusNode;
-          controller.text = widget.player.name;
-          focusNode.addListener(() => _onFocusChange(context));
-          if (widget.autofocus) {
-            WidgetsBinding.instance.addPostFrameCallback((_) => focusNode.requestFocus());
-          }
-        }
-        return TextField(
-          controller: controller,
-          focusNode: focusNode,
-          autofocus: false,
-          decoration: InputDecoration(labelText: AppLocalizations.of(context).playerIndex(widget.index + 1)),
-          textCapitalization: TextCapitalization.words,
-          onChanged: widget.onChanged,
-        );
-      },
     );
   }
 }
@@ -613,28 +492,23 @@ class _TeamsDialogState extends State<_TeamsDialog> {
         ),
       ),
       actions: [
-        Row(
-          children: [
-            if (widget.initialTeams.isNotEmpty)
-              TextButton(
-                onPressed: () => Navigator.pop(context, (teams: <Team>[], playerTeams: <String, String>{})),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: Text(l.removeTeams),
-              ),
-            const Spacer(),
-            TextButton(
-              onPressed: () => Navigator.pop(context, null),
-              child: Text(l.cancel),
-            ),
-            TextButton(
-              onPressed: !_allAssigned ? null : () {
-                final usedTeamIds = _playerTeams.values.toSet();
-                final activeTeams = _teams.where((t) => usedTeamIds.contains(t.id)).toList();
-                Navigator.pop(context, (teams: activeTeams, playerTeams: _playerTeams));
-              },
-              child: Text(l.confirm),
-            ),
-          ],
+        if (widget.initialTeams.isNotEmpty)
+          TextButton(
+            onPressed: () => Navigator.pop(context, (teams: <Team>[], playerTeams: <String, String>{})),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(l.removeTeams),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, null),
+          child: Text(l.cancel),
+        ),
+        TextButton(
+          onPressed: !_allAssigned ? null : () {
+            final usedTeamIds = _playerTeams.values.toSet();
+            final activeTeams = _teams.where((t) => usedTeamIds.contains(t.id)).toList();
+            Navigator.pop(context, (teams: activeTeams, playerTeams: _playerTeams));
+          },
+          child: Text(l.confirm),
         ),
       ],
     );

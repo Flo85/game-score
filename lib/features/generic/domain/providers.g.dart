@@ -526,7 +526,7 @@ final class GenericSetupPlayersProvider
 }
 
 String _$genericSetupPlayersHash() =>
-    r'4568b26cd2945aa4a2b0f4853650745a22eb82f3';
+    r'a9e31de741c1b94b5c0ed35eaccb130717bb6a0b';
 
 abstract class _$GenericSetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();

@@ -93,6 +93,14 @@ class AppDatabase extends _$AppDatabase {
             ..orderBy([(gp) => OrderingTerm.asc(gp.position)]))
           .get();
 
+  Stream<Map<String, int>> watchPlayerGameCounts(String gameType) => customSelect(
+        'SELECT gp.player_id AS pid, COUNT(*) AS c FROM game_players gp '
+        'JOIN games g ON g.id = gp.game_id '
+        'WHERE g.game_type = ? GROUP BY gp.player_id',
+        variables: [Variable.withString(gameType)],
+        readsFrom: {gamePlayers, games},
+      ).watch().map((rows) => {for (final r in rows) r.read<String>('pid'): r.read<int>('c')});
+
   // ── Stats joueur (optimisées SQL) ────────────────────────────────────────────
 
   Future<int> countPlayerGames(String playerId, String gameType) async {

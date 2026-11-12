@@ -93,7 +93,14 @@
   "endGame": "End game",
   "endGameAction": "End",
 
-  "maxPlayers": "Maximum 7 players",
+  "playersCounter": "{count}/{max} players maximum",
+  "@playersCounter": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "addAtLeastOnePlayer": "Add at least one player",
   "playerIndex": "Player {index}",
   "@playerIndex": {
     "placeholders": {
@@ -115,6 +122,15 @@
   },
   "duplicateName": "This name already exists",
   "playerNameHint": "Player name",
+  "frequentPlayers": "Frequent players",
+  "searchPlayer": "Search or create a player",
+  "done": "Done",
+  "createPlayerNamed": "Create \"{name}\"",
+  "@createPlayerNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
 
   "gamesCount": "{count, plural, =1{1 game} other{{count} games}}",
   "@gamesCount": {

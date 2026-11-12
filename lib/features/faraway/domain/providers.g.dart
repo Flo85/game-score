@@ -184,6 +184,81 @@ final class SavedPlayersListProvider
 
 String _$savedPlayersListHash() => r'bd7247c3f228a0037881e3028da073697f85ed27';
 
+@ProviderFor(playerGameCounts)
+final playerGameCountsProvider = PlayerGameCountsFamily._();
+
+final class PlayerGameCountsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, int>>,
+          Map<String, int>,
+          Stream<Map<String, int>>
+        >
+    with $FutureModifier<Map<String, int>>, $StreamProvider<Map<String, int>> {
+  PlayerGameCountsProvider._({
+    required PlayerGameCountsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'playerGameCountsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$playerGameCountsHash();
+
+  @override
+  String toString() {
+    return r'playerGameCountsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $StreamProviderElement<Map<String, int>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<Map<String, int>> create(Ref ref) {
+    final argument = this.argument as String;
+    return playerGameCounts(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PlayerGameCountsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$playerGameCountsHash() => r'2bf867c634c1bf045d4cf18eb530858ee5a9c1b1';
+
+final class PlayerGameCountsFamily extends $Family
+    with $FunctionalFamilyOverride<Stream<Map<String, int>>, String> {
+  PlayerGameCountsFamily._()
+    : super(
+        retry: null,
+        name: r'playerGameCountsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  PlayerGameCountsProvider call(String gameType) =>
+      PlayerGameCountsProvider._(argument: gameType, from: this);
+
+  @override
+  String toString() => r'playerGameCountsProvider';
+}
+
 @ProviderFor(gameHistory)
 final gameHistoryProvider = GameHistoryProvider._();
 
@@ -546,7 +621,7 @@ final class SetupPlayersProvider
   }
 }
 
-String _$setupPlayersHash() => r'0625570ca91ae07e6ed0ba4af36443bf48b379ce';
+String _$setupPlayersHash() => r'47951a517bd89cdc4ee8966cab3ab5672c589252';
 
 abstract class _$SetupPlayers extends $Notifier<List<Player>> {
   List<Player> build();

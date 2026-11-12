@@ -93,7 +93,8 @@
   "endGame": "Terminer la partie",
   "endGameAction": "Terminer",
 
-  "maxPlayers": "Maximum de 7 joueurs",
+  "playersCounter": "{count}/{max} joueurs maximum",
+  "addAtLeastOnePlayer": "Ajoutez au moins un joueur",
   "playerIndex": "Joueur {index}",
   "@playerIndex": {
     "placeholders": {
@@ -115,6 +116,10 @@
   },
   "duplicateName": "Ce nom existe déjà dans le carnet",
   "playerNameHint": "Nom du joueur",
+  "frequentPlayers": "Joueurs fréquents",
+  "searchPlayer": "Rechercher ou créer un joueur",
+  "done": "Terminé",
+  "createPlayerNamed": "Créer « {name} »",
 
   "gamesCount": "{count, plural, =1{1 partie} other{{count} parties}}",
   "@gamesCount": {
